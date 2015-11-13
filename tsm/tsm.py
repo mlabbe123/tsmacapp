@@ -4,8 +4,6 @@ import traceback
 import ctypes.wintypes
 from ctypes.wintypes import MAX_PATH
 
-ac.log('TheSetupMarket logs | tsm.py loaded')
-
 try: 
     import requests
 except Exception as e:
