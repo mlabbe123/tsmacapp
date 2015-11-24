@@ -139,7 +139,7 @@
 	'nurburgring-sprint',
 	'silverstone-international',
 	'spa',
-	'trento-baondone',
+	'trento-bondone',
 	// For both extended_circuit and club_circuit
 	'vallelunga',
 	'ks_zandvoort',
