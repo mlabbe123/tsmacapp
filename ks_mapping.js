@@ -117,7 +117,8 @@
 	ferrari_288gto_grb,
 	vsf1_ferrari_concept,
 	calibra_dtm,
-	peugeot_504
+	peugeot_504,
+	corvette_c6r
 ]
 
 // ac.getTrackName
