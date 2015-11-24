@@ -3,6 +3,7 @@ import os
 import traceback
 import ctypes.wintypes
 from ctypes.wintypes import MAX_PATH
+from operator import itemgetter, attrgetter, methodcaller
 
 try: 
     import requests
@@ -23,8 +24,10 @@ def getSetups(car_code, track_code):
     anyTracksSetups = []
     otherTrackSetups = []
 
+    ac.log(str(setups.sort(key=extract_sim_version)))
+
     for setup in setups:
-        trackSpecificSetups.append(setup)
+        # trackSpecificSetups.append(setup)
 
         if setup['car']['ac_code'] == car_code:
             if setup['track']['ac_code'] == track_code:
@@ -35,9 +38,9 @@ def getSetups(car_code, track_code):
                 otherTrackSetups.append(setup)
 
     categorizedSetupsObj = {}
-    categorizedSetupsObj['trackSpecific'] = trackSpecificSetups
-    categorizedSetupsObj['anyTracks'] = anyTracksSetups
-    categorizedSetupsObj['otherTracks'] = otherTrackSetups
+    categorizedSetupsObj['trackSpecific'] = filterSetups(trackSpecificSetups, 'sim_version', '1.3')
+    categorizedSetupsObj['anyTracks'] = filterSetups(anyTracksSetups, 'sim_version', '1.3')
+    categorizedSetupsObj['otherTracks'] = filterSetups(otherTrackSetups, 'sim_version', '1.3')
 
     return categorizedSetupsObj
 
@@ -77,3 +80,18 @@ def get_personal_folder():
         return buf.value
     else:
         raise Exception('Could not find "Documents" folder')
+
+def filterSetups(setupList, predicateName, predicateValue):
+    filteredSetupList = []
+
+    for setup in setupList:
+        if setup[predicateName] == predicateValue:
+            filteredSetupList.append(setup)
+
+    return filteredSetupList
+
+def extract_sim_version(setup):
+    try:
+        return setup['sim_version']
+    except KeyError:
+        return 0
