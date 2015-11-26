@@ -106,7 +106,6 @@
 	vsfr-formularenault35_2014_ldf,
 	sareni_camaro_gt3,
 	sareni_camaro_gt_racecar,
-	sareni_camaro_gt_racecar,
 	ifm_2009,
 	ifm_2009_hc,
 	shelby_cobra,
@@ -139,7 +138,7 @@
 	'nurburgring-sprint',
 	'silverstone-international',
 	'spa',
-	'trento-baondone',
+	'trento-bondone',
 	// For both extended_circuit and club_circuit
 	'vallelunga',
 	'ks_zandvoort',
