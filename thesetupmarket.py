@@ -238,12 +238,15 @@ def acMain(ac_version):
     # Set the base GUI
     initGUI(appWindow)
 
-    ac.log('carname: '+str(ac.getCarName(0)))
-    ac.log('trackname: '+str(ac.getTrackName(0)))
-    ac.log('trackconfig: '+str(ac.getTrackConfiguration(0)))
+    # ac.log('carname: '+str(ac.getCarName(0)))
+    # ac.log('trackname: '+str(ac.getTrackName(0)))
+    # ac.log('trackconfig: '+str(ac.getTrackConfiguration(0)))
 
     currentCarName = ac.getCarName(0)
-    currentTrackName = ac.getTrackName(0)
+    if ac.getTrackConfiguration(0) != '':
+        currentTrackName = ac.getTrackName(0) + '-' + ac.getTrackConfiguration(0)
+    else:
+        currentTrackName = ac.getTrackName(0)
 
     setups = tsm.getSetups(currentCarName, currentTrackName)
 
