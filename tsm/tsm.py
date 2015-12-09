@@ -3,6 +3,8 @@ import os
 import traceback
 import ctypes.wintypes
 from ctypes.wintypes import MAX_PATH
+from os.path import dirname, realpath
+import configparser
 from operator import itemgetter, attrgetter, methodcaller
 
 try: 
@@ -10,12 +12,19 @@ try:
 except Exception as e:
     ac.log('TheSetupMarket logs | error loading requests: '+traceback.format_exc())
 
+config_path = dirname(realpath(__file__))
+
+config_ini_file = config_path + '/../config/config.ini'
+
+config = configparser.ConfigParser()
+config.read(config_ini_file, encoding='utf-8')
+config.sections()
+sim_versions = config['filters']['SimVersion']
 
 def getSetups(car_code, track_code):
 
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
-        #r = resp.content.decode(encoding='UTF-8')
         setups = resp.json()
     except Exception as e:
         ac.log('TheSetupMarket logs | error requesting setups from tsm api: '+traceback.format_exc())
@@ -24,10 +33,12 @@ def getSetups(car_code, track_code):
     anyTracksSetups = []
     otherTrackSetups = []
 
-    ac.log(str(setups.sort(key=extract_sim_version)))
+    #ac.log(str(setups.sort(key=extract_sim_version)))
 
     for setup in setups:
         # trackSpecificSetups.append(setup)
+        # anyTracksSetups.append(setup)
+        # otherTrackSetups.append(setup)
 
         if setup['car']['ac_code'] == car_code:
             if setup['track']['ac_code'] == track_code:

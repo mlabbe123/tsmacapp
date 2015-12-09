@@ -17,7 +17,7 @@ tester=0
 class testEvent:
     def __init__(self, appWindow, labelCtrl, setupId, setupFilename):
         # When page change occurs, event on top of events cause problems...
-        ac.setText(labelCtrl, 'dl')
+
         # ac.log('setupId: '+str(setupId)+', setupFilename: '+str(setupFilename))
         self.event = functools.partial(self.downloadSetup, setupId=setupId, setupFilename=setupFilename)
         ac.addOnClickedListener(labelCtrl,self.event)
@@ -34,7 +34,7 @@ def acMain(ac_version):
     global appWindow, currentCarName, currentTrackName, setupId, setupFilename, tester, setups, listingTables, listingSpinners, listingTableMisc
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 600, 800)
+    ac.setSize(appWindow, 600, 655)
 
     listingTableMisc = {
         'trackSpecific': {
@@ -177,6 +177,7 @@ def acMain(ac_version):
         'otherTracks': OrderedDict([
             (1, {
                 'dl_cell': ac.addLabel(appWindow, ''),
+                'track_cell': ac.addLabel(appWindow, ''),
                 'author_cell': ac.addLabel(appWindow, ''),
                 'trim_cell': ac.addLabel(appWindow, ''),
                 'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -187,6 +188,7 @@ def acMain(ac_version):
             }),
             (2, {
                 'dl_cell': ac.addLabel(appWindow, ''),
+                'track_cell': ac.addLabel(appWindow, ''),
                 'author_cell': ac.addLabel(appWindow, ''),
                 'trim_cell': ac.addLabel(appWindow, ''),
                 'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -197,6 +199,7 @@ def acMain(ac_version):
             }),
             (3, {
                 'dl_cell': ac.addLabel(appWindow, ''),
+                'track_cell': ac.addLabel(appWindow, ''),
                 'author_cell': ac.addLabel(appWindow, ''),
                 'trim_cell': ac.addLabel(appWindow, ''),
                 'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -207,6 +210,7 @@ def acMain(ac_version):
             }),
             (4, {
                 'dl_cell': ac.addLabel(appWindow, ''),
+                'track_cell': ac.addLabel(appWindow, ''),
                 'author_cell': ac.addLabel(appWindow, ''),
                 'trim_cell': ac.addLabel(appWindow, ''),
                 'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -217,6 +221,7 @@ def acMain(ac_version):
             }),
             (5, {
                 'dl_cell': ac.addLabel(appWindow, ''),
+                'track_cell': ac.addLabel(appWindow, ''),
                 'author_cell': ac.addLabel(appWindow, ''),
                 'trim_cell': ac.addLabel(appWindow, ''),
                 'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -276,44 +281,68 @@ def initGUI(appWindow):
 
     ### Current track section ###
     section1Title = ac.addLabel(appWindow, "/Setups for current track")
-    ac.setPosition(section1Title, 10, 35)
+    ac.setPosition(section1Title, 10, 31)
 
     # Add header row for track specific setups table
-    addTableCell(appWindow, 'dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 60, 'center')
-    addTableCell(appWindow, 'Author', 210, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 50, 60, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 60, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 60, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 60, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 60, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 60, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 60, 'center')
+    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 53, 'center')
+    addTableCell(appWindow, 'Author', 225, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 53, 'center')
+    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 53, 'center')
+    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 53, 'center')
+    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 53, 'center')
+    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 53, 'center')
+    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 53, 'center')
+    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 53, 'center')
 
     ### Any track section ###
     section2Title = ac.addLabel(appWindow, "/Setups for no specific track")
-    ac.setPosition(section2Title, 10, 235)
+    ac.setPosition(section2Title, 10, 199)
 
     # Add header row for Any track setups table
-    addTableCell(appWindow, 'dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 260, 'center')
-    addTableCell(appWindow, 'Author', 210, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 50, 260, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 260, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 260, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 260, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 260, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 260, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 260, 'center')
+    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 222, 'center')
+    addTableCell(appWindow, 'Author', 225, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 222, 'center')
+    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 222, 'center')
+    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 222, 'center')
+    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 222, 'center')
+    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 222, 'center')
+    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 222, 'center')
+    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 222, 'center')
 
     section3Title=ac.addLabel(appWindow, "/Setups for other tracks")
-    ac.setPosition(section3Title, 10, 435)
+    ac.setPosition(section3Title, 10, 367)
     
     # Add header row for other tracks setups table
-    addTableCell(appWindow, 'dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 460, 'center')
-    addTableCell(appWindow, 'Author', 210, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 50, 460, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 460, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 460, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 460, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 460, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 460, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 460, 'center')
+    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 389, 'center')
+    addTableCell(appWindow, 'Track', 125, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 389, 'center')
+    addTableCell(appWindow, 'Author', 100, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 160, 389, 'center')
+    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 389, 'center')
+    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 389, 'center')
+    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 389, 'center')
+    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 389, 'center')
+    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 389, 'center')
+    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 389, 'center')
+
+    # SEPARATOR
+    separator = ac.addLabel(appWindow, '')
+
+    ac.setSize(separator, 600, 2)
+
+    ac.setBackgroundColor(separator, 1, 1, 1)
+    ac.setBackgroundOpacity(separator, 1)
+    ac.drawBackground(separator, 1)
+    ac.drawBorder(separator, 0)
+    ac.setVisible(separator, 1)
+
+    ac.setPosition(separator, 0, 559)
+
+    # Add upload section title
+    section4Title = ac.addLabel(appWindow, "/Upload setup")
+    ac.setPosition(section4Title, 10, 564)
+
+    # Add upload section message
+    uploadText1 = ac.addLabel(appWindow, "Still in development, coming soon (tm)")
+    ac.setPosition(uploadText1, 180, 592)
+    uploadText2 = ac.addLabel(appWindow, "In the meantime, go to thesetupmarket.com to create an account and upload your setup.")
+    ac.setPosition(uploadText2, 6, 613)
 
     # Init the setups listing table with empty labels
     for tableKey, listingTable in listingTables.items():
@@ -336,7 +365,7 @@ def initGUI(appWindow):
                 ac.setVisible(label, 0)
                 ac.setFontAlignment(label, 'center')
 
-            yPos += 25
+            yPos += GUIConfig.GUIConstants['tableLayout']['cellHeight'] + 1
             rowNumber += 1
 
     for tableKey, labels in listingTableMisc.items():
@@ -353,7 +382,7 @@ def initGUI(appWindow):
             ac.setFontAlignment(labelCtrl, 'center')
 
     for tableKey, spinner in listingSpinners.items():
-        ac.setPosition(spinner, 530, GUIConfig.GUIConstants['tableLayout'][tableKey]['startingYPosition'] + 130)
+        ac.setPosition(spinner, 530, GUIConfig.GUIConstants['tableLayout'][tableKey]['startingYPosition'] + 111)
         ac.setSize(spinner, 60, 20)
         ac.setVisible(spinner, 0)
 
@@ -387,8 +416,11 @@ def updateSetupsListingTable(setupCategory, setups):
 
             if cellName == 'dl_cell':
                 # ac.log('Download cell')
-                ac.setText(labelCtrl, 'dl')
+                ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
                 tester = testEvent(appWindow, labelCtrl, setupId, setupFilename)
+            elif cellName == 'track_cell':
+                ac.log(setup['track']['name'])
+                ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':
                 # ac.log(setup['author']['display_name'])
                 ac.setText(labelCtrl, setup['author']['display_name'])
