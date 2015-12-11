@@ -1,6 +1,5 @@
 import sys
 import ac
-# import acsys
 import traceback
 import functools
 import math
@@ -13,29 +12,28 @@ except Exception as e:
 
 from config import GUIConfig
 
-tester=0
-class testEvent:
+class downloadButtonEvent:
     def __init__(self, appWindow, labelCtrl, setupId, setupFilename):
-        # When page change occurs, event on top of events cause problems...
-
-        # ac.log('setupId: '+str(setupId)+', setupFilename: '+str(setupFilename))
         self.event = functools.partial(self.downloadSetup, setupId=setupId, setupFilename=setupFilename)
-        ac.addOnClickedListener(labelCtrl,self.event)
+        ac.addOnClickedListener(labelCtrl, self.event)
 
 
     def downloadSetup(self, x, y, setupId, setupFilename):
         global currentCarName, currentTrackName
 
-        ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
+        # ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackName)
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackName, setupId, setupFilename, tester, setups, listingTables, listingSpinners, listingTableMisc
+    global appWindow, currentCarName, currentTrackName, setupId, setupFilename, downloadButton, setups, listingTables, listingSpinners, listingTableMisc
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 600, 655)
 
+    downloadButton = 0
+
+    # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
         'trackSpecific': {
             'emptyRowLabel': {
@@ -69,6 +67,7 @@ def acMain(ac_version):
         }
     }
 
+    # Initialize the listing tables.
     listingTables = {
         'trackSpecific': OrderedDict([
             (1, {
@@ -233,7 +232,7 @@ def acMain(ac_version):
         ])
     }
 
-    #spinners
+    # Initialize the spinners.
     listingSpinners = {
         'trackSpecific': ac.addSpinner(appWindow, ''),
         'anyTracks': ac.addSpinner(appWindow, ''),
@@ -243,20 +242,22 @@ def acMain(ac_version):
     # Set the base GUI
     initGUI(appWindow)
 
-    # ac.log('carname: '+str(ac.getCarName(0)))
-    # ac.log('trackname: '+str(ac.getTrackName(0)))
-    # ac.log('trackconfig: '+str(ac.getTrackConfiguration(0)))
-
+    # Get current car name.
     currentCarName = ac.getCarName(0)
+
+    # Get current track name.
     if ac.getTrackConfiguration(0) != '':
         currentTrackName = ac.getTrackName(0) + '-' + ac.getTrackConfiguration(0)
     else:
         currentTrackName = ac.getTrackName(0)
 
+    # Get setups for current car and track.
     setups = tsm.getSetups(currentCarName, currentTrackName)
 
+    # Loop through every setups returned and update the listing tables.
     for setupType, setupList in setups.items():
 
+        # if there is setups for this type, update the related table.
         if len(setupList) > 0:
             if len(setupList) > GUIConfig.GUIConstants['setupsPerPage']:
                 # ac.log(str(setupType)+' setups pages: '+str(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']))
@@ -265,6 +266,7 @@ def acMain(ac_version):
             else:
                 # ac.log('One page only')
                 updateSetupsListingTable(setupType, setupList)
+        # if there is no setups for this type, show empty table label.
         else:
             # ac.log('No '+str(setupType)+' setups')
             ac.setVisible(listingTableMisc[setupType]['emptyRowLabel']['label'], 1)
@@ -323,15 +325,12 @@ def initGUI(appWindow):
 
     # SEPARATOR
     separator = ac.addLabel(appWindow, '')
-
     ac.setSize(separator, 600, 2)
-
     ac.setBackgroundColor(separator, 1, 1, 1)
     ac.setBackgroundOpacity(separator, 1)
     ac.drawBackground(separator, 1)
     ac.drawBorder(separator, 0)
     ac.setVisible(separator, 1)
-
     ac.setPosition(separator, 0, 559)
 
     # Add upload section title
@@ -340,9 +339,19 @@ def initGUI(appWindow):
 
     # Add upload section message
     uploadText1 = ac.addLabel(appWindow, "Still in development, coming soon (tm)")
-    ac.setPosition(uploadText1, 180, 592)
-    uploadText2 = ac.addLabel(appWindow, "In the meantime, go to thesetupmarket.com to create an account and upload your setup.")
-    ac.setPosition(uploadText2, 6, 613)
+    ac.setPosition(uploadText1, 180, 585)
+
+    # MINI SEPARATOR
+    miniseparator = ac.addLabel(appWindow, '')
+    ac.setSize(miniseparator, 100, 1)
+    ac.setBackgroundColor(miniseparator, 1, 1, 1)
+    ac.setBackgroundOpacity(miniseparator, 1)
+    ac.drawBackground(miniseparator, 1)
+    ac.drawBorder(miniseparator, 0)
+    ac.setVisible(miniseparator, 1)
+    ac.setPosition(miniseparator, 252, 612)
+    uploadText2 = ac.addLabel(appWindow, "In the meantime, please create an account at thesetupmarket.com to upload setups.")
+    ac.setPosition(uploadText2, 23, 615)
 
     # Init the setups listing table with empty labels
     for tableKey, listingTable in listingTables.items():
@@ -417,9 +426,8 @@ def updateSetupsListingTable(setupCategory, setups):
             if cellName == 'dl_cell':
                 # ac.log('Download cell')
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
-                tester = testEvent(appWindow, labelCtrl, setupId, setupFilename)
+                downloadButton = downloadButtonEvent(appWindow, labelCtrl, setupId, setupFilename)
             elif cellName == 'track_cell':
-                ac.log(setup['track']['name'])
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':
                 # ac.log(setup['author']['display_name'])
@@ -488,7 +496,6 @@ def onTrackSpecificPageChangeSpinnerClick(x):
 
 
 def onAnyTrackPageChangeSpinnerClick(x):
-    ac.console('onAnyTrackPageChangeSpinnerClick :: page: '+str(x))
     global setups
 
     fromIndex = x * GUIConfig.GUIConstants['setupsPerPage'] - GUIConfig.GUIConstants['setupsPerPage']
@@ -498,7 +505,6 @@ def onAnyTrackPageChangeSpinnerClick(x):
 
 
 def onOtherTracksPageChangeSpinnerClick(x):
-    ac.console('onOtherTracksPageChangeSpinnerClick :: page: '+str(x))
     global setups
 
     fromIndex = x * GUIConfig.GUIConstants['setupsPerPage'] - GUIConfig.GUIConstants['setupsPerPage']
