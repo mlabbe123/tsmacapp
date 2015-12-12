@@ -12,26 +12,27 @@ except Exception as e:
 
 from config import GUIConfig
 
+downloadButton = 0
 class downloadButtonEvent:
     def __init__(self, appWindow, labelCtrl, setupId, setupFilename):
-        self.event = functools.partial(self.downloadSetup, setupId=setupId, setupFilename=setupFilename)
+        self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
         ac.addOnClickedListener(labelCtrl, self.event)
 
 
     def downloadSetup(self, x, y, setupId, setupFilename):
         global currentCarName, currentTrackName
 
-        # ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
+        ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackName)
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackName, setupId, setupFilename, downloadButton, setups, listingTables, listingSpinners, listingTableMisc
+    global appWindow, currentCarName, currentTrackName, setupId, setupFilename, setups, listingTables, listingSpinners, listingTableMisc
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 600, 655)
 
-    downloadButton = 0
+    # downloadButton = 0
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
@@ -311,7 +312,7 @@ def initGUI(appWindow):
 
     section3Title=ac.addLabel(appWindow, "/Setups for other tracks")
     ac.setPosition(section3Title, 10, 367)
-    
+
     # Add header row for other tracks setups table
     addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 389, 'center')
     addTableCell(appWindow, 'Track', 125, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 389, 'center')
@@ -361,7 +362,7 @@ def initGUI(appWindow):
 
         for key, cells in listingTable.items():
             # ac.log('tableKey: '+tableKey+' | rowId: '+str(key))
-            
+
             for cellId, label in cells.items():
                 #ac.log(tableKey+' :: '+rowId+' :: cellId: '+str(cellId)+', label: '+str(label)+'\n')
                 ac.setPosition(label, GUIConfig.GUIConstants['tableLayout'][tableKey]['xPos'][cellId], yPos)
@@ -417,7 +418,7 @@ def updateSetupsListingTable(setupCategory, setups):
 
     for setup in setups:
         setupId = setup['_id']
-        setupFilename = setup['file_name']
+        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + str(setup['version'])
 
         # ac.log('Row '+str(rowNumber)+'----------------------')
         for cellName, labelCtrl in listingTables[setupCategory][rowNumber].items():
