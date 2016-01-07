@@ -14,7 +14,7 @@ from config import GUIConfig
 
 downloadButton = 0
 class downloadButtonEvent:
-    def __init__(self, appWindow, labelCtrl, setupId, setupFilename):
+    def __init__(self, labelCtrl, setupId, setupFilename):
         self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
         ac.addOnClickedListener(labelCtrl, self.event)
 
@@ -418,7 +418,7 @@ def updateSetupsListingTable(setupCategory, setups):
 
     for setup in setups:
         setupId = setup['_id']
-        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + str(setup['version'])
+        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + '_v' + str(setup['version']) + '.ini'
 
         # ac.log('Row '+str(rowNumber)+'----------------------')
         for cellName, labelCtrl in listingTables[setupCategory][rowNumber].items():
@@ -427,7 +427,7 @@ def updateSetupsListingTable(setupCategory, setups):
             if cellName == 'dl_cell':
                 # ac.log('Download cell')
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
-                downloadButton = downloadButtonEvent(appWindow, labelCtrl, setupId, setupFilename)
+                downloadButton = downloadButtonEvent(labelCtrl, setupId, setupFilename)
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':

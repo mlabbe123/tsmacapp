@@ -22,6 +22,8 @@ config.sections()
 sim_versions = config['filters']['SimVersion']
 
 def getSetups(car_code, track_code):
+    ac.log('TSM || car_code: '+car_code)
+    ac.log('TSM || track_code: '+track_code)
 
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
@@ -49,9 +51,9 @@ def getSetups(car_code, track_code):
                 otherTrackSetups.append(setup)
 
     categorizedSetupsObj = {}
-    categorizedSetupsObj['trackSpecific'] = filterSetups(trackSpecificSetups, 'sim_version', '1.3')
-    categorizedSetupsObj['anyTracks'] = filterSetups(anyTracksSetups, 'sim_version', '1.3')
-    categorizedSetupsObj['otherTracks'] = filterSetups(otherTrackSetups, 'sim_version', '1.3')
+    categorizedSetupsObj['trackSpecific'] = trackSpecificSetups
+    categorizedSetupsObj['anyTracks'] = anyTracksSetups
+    categorizedSetupsObj['otherTracks'] = otherTrackSetups
 
     return categorizedSetupsObj
 
