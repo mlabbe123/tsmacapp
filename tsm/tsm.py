@@ -29,7 +29,7 @@ def getSetups(car_code, track_code):
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
         setups = resp.json()
     except Exception as e:
-        ac.log('TheSetupMarket logs | error requesting setups from tsm api: '+traceback.format_exc())
+        ac.log('TheSetupMarket logs | error requesting setups from tsm api: ' + traceback.format_exc())
 
     trackSpecificSetups = []
     anyTracksSetups = []
@@ -58,31 +58,36 @@ def getSetups(car_code, track_code):
     return categorizedSetupsObj
 
 
-def downloadSetup(setup_id, setup_file_name, car_ac_code, track_ac_code):
+def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_layout):
 
     url = "http://thesetupmarket.com/setup_files/55c2cddddebcbba924bb2a34/" + setup_id + "/"
 
     # Other very akward and non working ways to get Documents folder
-    #path_to_save = os.path.expanduser(r'~\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_ac_code + '\\' + setup_file_name)
+    #path_to_save = os.path.expanduser(r'~\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + setup_file_name)
 
     # CSIDL_PERSONAL = 5       # My Documents
     # SHGFP_TYPE_CURRENT = 1   # Get current, not default value
     # buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
     # ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-    # path_to_save = buf.value + r'~\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_ac_code + '\\' + setup_file_name
+    # path_to_save = buf.value + r'~\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + setup_file_name
 
     #path_to_save = 'E:/Mes documents/Assetto Corsa/setups/ferrari_458_gt2/spa/'+setup_file_name
 
     # Thank you rivali tempo devs...
-    path_to_save = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_ac_code + '\\' + setup_file_name
+    path_to_save = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + setup_file_name
 
     r = requests.get(url)
 
     if r.status_code == 200:
         ac.console('TheSetupMarket logs | setupid: ' + setup_id + ' downloaded')
-        with open(path_to_save, 'wb') as fd:
-            for chunk in r.iter_content(chunk_size=1):
-                fd.write(chunk)
+        try:
+            ac.log('TheSetupMarket logs | trying path_to_save: ' + path_to_save)
+            with open(path_to_save, 'wb') as fd:
+                for chunk in r.iter_content(chunk_size=1):
+                    fd.write(chunk)
+        except:
+            ac.log('TheSetupMarket logs | could not find folder to save')
+
     else:
         ac.log('TheSetupMarket logs | setupid: ' + setup_id + 'error while downloading')
 

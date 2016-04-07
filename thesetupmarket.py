@@ -20,14 +20,14 @@ class downloadButtonEvent:
 
 
     def downloadSetup(self, x, y, setupId, setupFilename):
-        global currentCarName, currentTrackName
+        global currentCarName, currentTrackBaseName, currentTrackLayout
 
         ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
-        tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackName)
+        tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackName, setupId, setupFilename, setups, listingTables, listingSpinners, listingTableMisc
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupId, setupFilename, setups, listingTables, listingSpinners, listingTableMisc
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 600, 655)
@@ -245,15 +245,17 @@ def acMain(ac_version):
 
     # Get current car name.
     currentCarName = ac.getCarName(0)
+    currentTrackBaseName = ac.getTrackName(0)
+    currentTrackLayout = ac.getTrackConfiguration(0)
 
     # Get current track name.
     if ac.getTrackConfiguration(0) != '':
-        currentTrackName = ac.getTrackName(0) + '-' + ac.getTrackConfiguration(0)
+        currentTrackFullName = ac.getTrackName(0) + '-' + ac.getTrackConfiguration(0)
     else:
-        currentTrackName = ac.getTrackName(0)
+        currentTrackFullName = ac.getTrackName(0)
 
     # Get setups for current car and track.
-    setups = tsm.getSetups(currentCarName, currentTrackName)
+    setups = tsm.getSetups(currentCarName, currentTrackFullName)
 
     # Loop through every setups returned and update the listing tables.
     for setupType, setupList in setups.items():
@@ -418,7 +420,12 @@ def updateSetupsListingTable(setupCategory, setups):
 
     for setup in setups:
         setupId = setup['_id']
-        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + '_v' + str(setup['version']) + '.ini'
+        if currentTrackLayout != '':
+            trackLayoutForFileName = '_' + currentTrackLayout + '_'
+        else:
+            trackLayoutForFileName = ''
+
+        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + trackLayoutForFileName + '_v' + str(setup['version']) + '.ini'
 
         # ac.log('Row '+str(rowNumber)+'----------------------')
         for cellName, labelCtrl in listingTables[setupCategory][rowNumber].items():
