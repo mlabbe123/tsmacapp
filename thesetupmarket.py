@@ -12,241 +12,135 @@ except Exception as e:
 
 from config import GUIConfig
 
-downloadButton = 0
-class downloadButtonEvent:
-    def __init__(self, labelCtrl, setupId, setupFilename):
-        self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
-        ac.addOnClickedListener(labelCtrl, self.event)
+import functools
+import threading
 
 
-    def downloadSetup(self, x, y, setupId, setupFilename):
-        global currentCarName, currentTrackBaseName, currentTrackLayout
+def async(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        t = threading.Thread(target=func, args=args, kwargs=kwargs)
+        t.daemon = True
+        t.start()
+        return t
+    return wrapper
 
-        ac.log('Download --> setupId: '+str(setupId)+' | filename: '+setupFilename)
-        tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
+# downloadButton = 0
+# class downloadButtonEvent:
+#     def __init__(self, labelCtrl, index):
+#         self.event = functools.partial(self.downloadSetup, setupId = eventInfos['setupIds'][index], setupFilename = eventInfos['setupFilenames'][index])
+#         ac.addOnClickedListener(labelCtrl, self.event)
+#
+#
+#     def downloadSetup(self, x, y, setupId, setupFilename):
+#         global currentCarName, currentTrackBaseName, currentTrackLayout
+#
+#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
+
+# class testEvent:
+#     def __init__(self, labelCtrl, setupId, setupFilename):
+#         self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
+#         ac.addOnClickedListener(labelCtrl, self.event)
+#
+#
+#     def downloadSetup(self, x, y, setupId, setupFilename):
+#         global currentCarName, currentTrackBaseName, currentTrackLayout
+#
+#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currenclass testEvent:
+#     def __init__(self, labelCtrl, setupId, setupFilename):
+#         self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
+#         ac.addOnClickedListener(labelCtrl, self.event)
+#
+#
+#     def downloadSetup(self, x, y, setupId, setupFilename):
+#         global currentCarName, currentTrackBaseName, currentTrackLayout
+#
+#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupId, setupFilename, setups, listingTables, listingSpinners, listingTableMisc
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackFullName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 600, 655)
+    ac.setSize(appWindow, 600, 320)
 
     # downloadButton = 0
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
-        'trackSpecific': {
-            'emptyRowLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'No setups for current car and track'
-            },
-            'loadingLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'Loading...'
-            },
+        'emptyRowLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'No setups for current car and track'
         },
-        'anyTracks': {
-            'emptyRowLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'No setups for current car and no specfic track'
-            },
-            'loadingLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'Loading...'
-            },
-        },
-        'otherTracks': {
-            'emptyRowLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'No setups for current car and other tracks'
-            },
-            'loadingLabel': {
-                'label': ac.addLabel(appWindow, ''),
-                'text': 'Loading...'
-            },
+        'loadingLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Loading...'
         }
     }
 
     # Initialize the listing tables.
-    listingTables = {
-        'trackSpecific': OrderedDict([
-            (1, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (2, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (3, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (4, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (5, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            })
-        ]),
-        'anyTracks': OrderedDict([
-            (1, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (2, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (3, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (4, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (5, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            })
-        ]),
-        'otherTracks': OrderedDict([
-            (1, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'track_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (2, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'track_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (3, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'track_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (4, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'track_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            }),
-            (5, {
-                'dl_cell': ac.addLabel(appWindow, ''),
-                'track_cell': ac.addLabel(appWindow, ''),
-                'author_cell': ac.addLabel(appWindow, ''),
-                'trim_cell': ac.addLabel(appWindow, ''),
-                'bestlap_cell': ac.addLabel(appWindow, ''),
-                'rating_cell': ac.addLabel(appWindow, ''),
-                'downloads_cell': ac.addLabel(appWindow, ''),
-                'acversion_cell': ac.addLabel(appWindow, ''),
-                'version_cell': ac.addLabel(appWindow, '')
-            })
-        ])
-    }
+    listingTable = OrderedDict([
+        (1, {
+            'dl_cell': ac.addLabel(appWindow, ''),
+            'author_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'bestlap_cell': ac.addLabel(appWindow, ''),
+            'rating_cell': ac.addLabel(appWindow, ''),
+            'downloads_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (2, {
+            'dl_cell': ac.addLabel(appWindow, ''),
+            'author_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'bestlap_cell': ac.addLabel(appWindow, ''),
+            'rating_cell': ac.addLabel(appWindow, ''),
+            'downloads_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (3, {
+            'dl_cell': ac.addLabel(appWindow, ''),
+            'author_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'bestlap_cell': ac.addLabel(appWindow, ''),
+            'rating_cell': ac.addLabel(appWindow, ''),
+            'downloads_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (4, {
+            'dl_cell': ac.addLabel(appWindow, ''),
+            'author_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'bestlap_cell': ac.addLabel(appWindow, ''),
+            'rating_cell': ac.addLabel(appWindow, ''),
+            'downloads_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (5, {
+            'dl_cell': ac.addLabel(appWindow, ''),
+            'author_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'bestlap_cell': ac.addLabel(appWindow, ''),
+            'rating_cell': ac.addLabel(appWindow, ''),
+            'downloads_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        })
+    ])
 
-    # Initialize the spinners.
-    listingSpinners = {
-        'trackSpecific': ac.addSpinner(appWindow, ''),
-        'anyTracks': ac.addSpinner(appWindow, ''),
-        'otherTracks': ac.addSpinner(appWindow, '')
-    }
-
-    # Set the base GUI
-    initGUI(appWindow)
-
-    # Get current car name.
+    # Get current car/track/layout.
     currentCarName = ac.getCarName(0)
     currentTrackBaseName = ac.getTrackName(0)
     currentTrackLayout = ac.getTrackConfiguration(0)
+    # Set the default active setup type
+    activeSetupType = 'trackSpecific'
+
+     # Set the base GUI
+    initGUI(appWindow)
 
     # Get current track name.
     if ac.getTrackConfiguration(0) != '':
@@ -257,36 +151,49 @@ def acMain(ac_version):
     # Get setups for current car and track.
     setups = tsm.getSetups(currentCarName, currentTrackFullName)
 
-    # Loop through every setups returned and update the listing tables.
-    for setupType, setupList in setups.items():
+    # If there is setups for the default type, update the table.
+    if len(setups[activeSetupType]) > 0:
 
-        # if there is setups for this type, update the related table.
-        if len(setupList) > 0:
-            if len(setupList) > GUIConfig.GUIConstants['setupsPerPage']:
-                # ac.log(str(setupType)+' setups pages: '+str(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']))
-                updateSetupsListingTable(setupType, setupList[:5])
-                updatePageSpinner(setupType, math.ceil(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']), 1)
-            else:
-                # ac.log('One page only')
-                updateSetupsListingTable(setupType, setupList)
-        # if there is no setups for this type, show empty table label.
+        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
+        if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
+            # ac.log(str(setupType)+' setups pages: '+str(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']))
+            updateSetupsListingTable(setups[activeSetupType][:5])
+            updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
         else:
-            # ac.log('No '+str(setupType)+' setups')
-            ac.setVisible(listingTableMisc[setupType]['emptyRowLabel']['label'], 1)
+            # ac.log('One page only')
+            updateSetupsListingTable(setups[activeSetupType])
+
+    # if there is no setups for this type, show empty table label.
+    else:
+        # ac.log('No '+str(setupType)+' setups')
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
 
     return "The Setup Market"
 
 
 def initGUI(appWindow):
-    global section1Title, section2Title, listingTables, listingTableMisc
+    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType
 
     ###################################
     ### Download section            ###
     ###################################
 
     ### Current track section ###
-    section1Title = ac.addLabel(appWindow, "/Setups for current track")
+    section1Title = ac.addLabel(appWindow, "/Download setups")
     ac.setPosition(section1Title, 10, 31)
+
+    # Setting up the refresh setups button
+    refreshSetupsButton = ac.addButton(appWindow, '')
+    ac.setPosition(refreshSetupsButton, 520, 30)
+    ac.setSize(refreshSetupsButton, 70, 20)
+    ac.setText(refreshSetupsButton, 'Refresh')
+    ac.setVisible(refreshSetupsButton, 1)
+    ac.setBackgroundColor(refreshSetupsButton, 1, 1, 1)
+    ac.setFontColor(refreshSetupsButton, 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(refreshSetupsButton, 1)
+    ac.drawBackground(refreshSetupsButton, 1)
+    ac.drawBorder(refreshSetupsButton, 0)
+    ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
     addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 53, 'center')
@@ -298,33 +205,78 @@ def initGUI(appWindow):
     addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 53, 'center')
     addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 53, 'center')
 
-    ### Any track section ###
-    section2Title = ac.addLabel(appWindow, "/Setups for no specific track")
-    ac.setPosition(section2Title, 10, 199)
+    # Init the setups listing table with empty labels
+    yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
+    rowNumber = 1
 
-    # Add header row for Any track setups table
-    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 222, 'center')
-    addTableCell(appWindow, 'Author', 225, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 222, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 222, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 222, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 222, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 222, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 222, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 222, 'center')
+    for key, cells in listingTable.items():
 
-    section3Title=ac.addLabel(appWindow, "/Setups for other tracks")
-    ac.setPosition(section3Title, 10, 367)
+        for cellId, label in cells.items():
+            ac.setPosition(label, GUIConfig.GUIConstants['tableLayout']['xPos'][cellId], yPos)
+            ac.setText(label, '')
+            ac.setSize(label, GUIConfig.GUIConstants['tableLayout']['cellXSize'][cellId], GUIConfig.GUIConstants['tableLayout']['cellHeight'])
+            ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'], GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'], GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])
+            ac.setBackgroundOpacity(label, 1)
+            ac.drawBackground(label, 1)
+            ac.drawBorder(label, 0)
+            ac.setVisible(label, 0)
+            ac.setFontAlignment(label, 'center')
 
-    # Add header row for other tracks setups table
-    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 389, 'center')
-    addTableCell(appWindow, 'Track', 125, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 389, 'center')
-    addTableCell(appWindow, 'Author', 100, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 160, 389, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 389, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 389, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 389, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 389, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 389, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 389, 'center')
+            if cellId == 'dl_cell':
+                if rowNumber == 1:
+                    ac.addOnClickedListener(label, onDownloadButton1Clicked)
+                elif rowNumber == 2:
+                    ac.addOnClickedListener(label, onDownloadButton2Clicked)
+                elif rowNumber == 3:
+                    ac.addOnClickedListener(label, onDownloadButton3Clicked)
+                elif rowNumber == 4:
+                    ac.addOnClickedListener(label, onDownloadButton4Clicked)
+                elif rowNumber == 5:
+                    ac.addOnClickedListener(label, onDownloadButton5Clicked)
+
+
+        yPos += GUIConfig.GUIConstants['tableLayout']['cellHeight'] + 1
+        rowNumber += 1
+
+    for labelName, labelConfig in listingTableMisc.items():
+        labelCtrl = labelConfig['label']
+        labelText = labelConfig['text']
+
+        ac.setText(labelCtrl, labelText)
+        ac.setPosition(labelCtrl, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
+        ac.setSize(labelCtrl, 580, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
+        ac.drawBorder(labelCtrl, 0)
+        ac.setVisible(labelCtrl, 0)
+        ac.setFontAlignment(labelCtrl, 'center')
+
+    # SEPARATOR BEFORE SPINNERS
+    separator1 = ac.addLabel(appWindow, '')
+    ac.setSize(separator1, 580, 1)
+    ac.setBackgroundColor(separator1, 1, 1, 1)
+    ac.setBackgroundOpacity(separator1, 1)
+    ac.drawBackground(separator1, 1)
+    ac.drawBorder(separator1, 0)
+    ac.setVisible(separator1, 1)
+    ac.setPosition(separator1, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 114)
+
+    # Setting up the setups listing setup type button
+    listingTableSetupTypeButton = ac.addButton(appWindow, '')
+    ac.setPosition(listingTableSetupTypeButton, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
+    ac.setSize(listingTableSetupTypeButton, 140, 22)
+    ac.setText(listingTableSetupTypeButton, 'Current Track')
+    ac.setVisible(listingTableSetupTypeButton, 1)
+    ac.setBackgroundColor(listingTableSetupTypeButton, 1, 1, 1)
+    ac.setFontColor(listingTableSetupTypeButton, 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(listingTableSetupTypeButton, 1)
+    ac.drawBackground(listingTableSetupTypeButton, 1)
+    ac.drawBorder(listingTableSetupTypeButton, 0)
+    ac.addOnClickedListener(listingTableSetupTypeButton, onListingTableSetupTypeButtonClick)
+
+    # Setting up the setups listing table page spinner
+    listingTablePageSpinner = ac.addSpinner(appWindow, '')
+    ac.setPosition(listingTablePageSpinner, 530, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
+    ac.setSize(listingTablePageSpinner, 60, 20)
+    ac.setVisible(listingTablePageSpinner, 0)
 
     # SEPARATOR
     separator = ac.addLabel(appWindow, '')
@@ -334,15 +286,15 @@ def initGUI(appWindow):
     ac.drawBackground(separator, 1)
     ac.drawBorder(separator, 0)
     ac.setVisible(separator, 1)
-    ac.setPosition(separator, 0, 559)
+    ac.setPosition(separator, 0, 228)
 
     # Add upload section title
     section4Title = ac.addLabel(appWindow, "/Upload setup")
-    ac.setPosition(section4Title, 10, 564)
+    ac.setPosition(section4Title, 10, 235)
 
     # Add upload section message
     uploadText1 = ac.addLabel(appWindow, "Still in development, coming soon (tm)")
-    ac.setPosition(uploadText1, 180, 585)
+    ac.setPosition(uploadText1, 180, 256)
 
     # MINI SEPARATOR
     miniseparator = ac.addLabel(appWindow, '')
@@ -352,51 +304,10 @@ def initGUI(appWindow):
     ac.drawBackground(miniseparator, 1)
     ac.drawBorder(miniseparator, 0)
     ac.setVisible(miniseparator, 1)
-    ac.setPosition(miniseparator, 252, 612)
+    ac.setPosition(miniseparator, 252, 282)
+
     uploadText2 = ac.addLabel(appWindow, "In the meantime, please create an account at thesetupmarket.com to upload setups.")
-    ac.setPosition(uploadText2, 23, 615)
-
-    # Init the setups listing table with empty labels
-    for tableKey, listingTable in listingTables.items():
-        yPos = GUIConfig.GUIConstants['tableLayout'][tableKey]['startingYPosition']
-        rowNumber = 1
-        # ac.log(str(listingTable))
-
-        for key, cells in listingTable.items():
-            # ac.log('tableKey: '+tableKey+' | rowId: '+str(key))
-
-            for cellId, label in cells.items():
-                #ac.log(tableKey+' :: '+rowId+' :: cellId: '+str(cellId)+', label: '+str(label)+'\n')
-                ac.setPosition(label, GUIConfig.GUIConstants['tableLayout'][tableKey]['xPos'][cellId], yPos)
-                ac.setText(label, '')
-                ac.setSize(label, GUIConfig.GUIConstants['tableLayout'][tableKey]['cellXSize'][cellId], GUIConfig.GUIConstants['tableLayout']['cellHeight'])
-                ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'], GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'], GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])
-                ac.setBackgroundOpacity(label, 1)
-                ac.drawBackground(label, 1)
-                ac.drawBorder(label, 0)
-                ac.setVisible(label, 0)
-                ac.setFontAlignment(label, 'center')
-
-            yPos += GUIConfig.GUIConstants['tableLayout']['cellHeight'] + 1
-            rowNumber += 1
-
-    for tableKey, labels in listingTableMisc.items():
-
-        for labelName, labelConfig in labels.items():
-            labelCtrl = labelConfig['label']
-            labelText = labelConfig['text']
-
-            ac.setText(labelCtrl, labelText)
-            ac.setPosition(labelCtrl, 10, GUIConfig.GUIConstants['tableLayout'][tableKey]['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
-            ac.setSize(labelCtrl, 580, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
-            ac.drawBorder(labelCtrl, 0)
-            ac.setVisible(labelCtrl, 0)
-            ac.setFontAlignment(labelCtrl, 'center')
-
-    for tableKey, spinner in listingSpinners.items():
-        ac.setPosition(spinner, 530, GUIConfig.GUIConstants['tableLayout'][tableKey]['startingYPosition'] + 111)
-        ac.setSize(spinner, 60, 20)
-        ac.setVisible(spinner, 0)
+    ac.setPosition(uploadText2, 23, 286)
 
 
 def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
@@ -415,26 +326,48 @@ def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
     ac.setFontAlignment(cell, textAlign)
 
 
-def updateSetupsListingTable(setupCategory, setups):
+def updateSetupsListingTable(setups):
+    global eventInfos
+
+    if len(setups) == 0:
+        if activeSetupType == 'trackSpecific':
+            ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+            ac.setText(listingTableMisc['emptyRowLabel']['label'], 'No setups for current track')
+        elif activeSetupType == 'anyTracks':
+            ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+            ac.setText(listingTableMisc['emptyRowLabel']['label'], 'No setups for no specific tracks')
+        elif activeSetupType == 'otherTracks':
+            ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+            ac.setText(listingTableMisc['emptyRowLabel']['label'], 'No setups for other tracks')
+    else:
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 0)
+
+
+    if currentTrackLayout != '':
+        trackLayoutForFileName = '-' + currentTrackLayout
+    else:
+        trackLayoutForFileName = ''
+
+    # Set setupIds and setupFilenames for events listeners
+    eventInfos = {
+        'setupIds': {},
+        'setupFilenames': {}
+    }
+
     rowNumber = 1
 
     for setup in setups:
         setupId = setup['_id']
-        if currentTrackLayout != '':
-            trackLayoutForFileName = '_' + currentTrackLayout + '_'
-        else:
-            trackLayoutForFileName = ''
 
-        setupFilename = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + trackLayoutForFileName + '_v' + str(setup['version']) + '.ini'
+        eventInfos['setupIds'][rowNumber - 1] = setupId
+        eventInfos['setupFilenames'][rowNumber - 1] = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + '_' + setup['track']['name'] + '_v' + str(setup['version']) + '.ini'
 
-        # ac.log('Row '+str(rowNumber)+'----------------------')
-        for cellName, labelCtrl in listingTables[setupCategory][rowNumber].items():
+        for cellName, labelCtrl in listingTable[rowNumber].items():
             ac.setVisible(labelCtrl, 1)
 
             if cellName == 'dl_cell':
                 # ac.log('Download cell')
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
-                downloadButton = downloadButtonEvent(labelCtrl, setupId, setupFilename)
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':
@@ -476,46 +409,106 @@ def updateSetupsListingTable(setupCategory, setups):
 
         rowNumber += 1
 
+    ac.log('TheSetupMarket logs | eventInfos: ' + str(eventInfos))
 
-def updatePageSpinner(setupType, pageCount, currentValue):
-    global listingSpinners
-
-    spinner = listingSpinners[setupType]
-
-    ac.setVisible(spinner, 1)
-    ac.setRange(spinner, 1, pageCount)
-    ac.setValue(spinner, currentValue)
-
-    if setupType == 'trackSpecific':
-        ac.addOnValueChangeListener(spinner, onTrackSpecificPageChangeSpinnerClick)
-    elif setupType == 'anyTracks':
-        ac.addOnValueChangeListener(spinner, onAnyTrackPageChangeSpinnerClick)
-    elif setupType == 'otherTracks':
-        ac.addOnValueChangeListener(spinner, onOtherTracksPageChangeSpinnerClick)
+    if len(setups) < GUIConfig.GUIConstants['setupsPerPage']:
+        ac.log('TheSetupMarket logs | setups length less than 5. Length = ' + str(len(setups)))
+        # Set all remaining rows to not visible
+        for index in range(GUIConfig.GUIConstants['setupsPerPage'] - len(setups)):
+           for cellName, labelCtrl in listingTable[GUIConfig.GUIConstants['setupsPerPage'] - index].items():
+               ac.setVisible(labelCtrl, 0)
 
 
-def onTrackSpecificPageChangeSpinnerClick(x):
-    global setups
+def updatePageSpinner(pageCount, currentValue):
+    global listingTablePageSpinner
 
-    fromIndex = x * GUIConfig.GUIConstants['setupsPerPage'] - GUIConfig.GUIConstants['setupsPerPage']
-    toIndex = x * GUIConfig.GUIConstants['setupsPerPage']
+    if pageCount > 1:
+        ac.setVisible(listingTablePageSpinner, 1)
+        ac.setRange(listingTablePageSpinner, 1, pageCount)
+        ac.setValue(listingTablePageSpinner, currentValue)
 
-    updateSetupsListingTable('trackSpecific', setups['trackSpecific'][fromIndex:toIndex])
+        ac.addOnValueChangeListener(listingTablePageSpinner, onListingTablePageSpinnerClick)
+    else:
+         ac.setVisible(listingTablePageSpinner, 0)
 
 
-def onAnyTrackPageChangeSpinnerClick(x):
-    global setups
+def onListingTablePageSpinnerClick(x):
+    global setups, activeSetupType
 
     fromIndex = x * GUIConfig.GUIConstants['setupsPerPage'] - GUIConfig.GUIConstants['setupsPerPage']
     toIndex = x * GUIConfig.GUIConstants['setupsPerPage']
 
-    updateSetupsListingTable('anyTracks', setups['anyTracks'][fromIndex:toIndex])
+    updateSetupsListingTable(setups[activeSetupType][fromIndex:toIndex])
 
 
-def onOtherTracksPageChangeSpinnerClick(x):
+def onListingTableSetupTypeButtonClick(*args):
+    global activeSetupType
+
+    if activeSetupType == 'trackSpecific':
+        ac.log('TheSetupMarket logs | setups for anyTracks: ' + str(len(setups['anyTracks'])))
+        activeSetupType = 'anyTracks'
+        updateSetupsListingTable(setups['anyTracks'][:5])
+        ac.setText(listingTableSetupTypeButton, 'Any Tracks')
+        updatePageSpinner(math.ceil(len(setups['anyTracks']) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+    elif activeSetupType == 'anyTracks':
+        ac.log('TheSetupMarket logs | setups for otherTracks: ' + str(len(setups['otherTracks'])))
+        activeSetupType = 'otherTracks'
+        updateSetupsListingTable(setups['otherTracks'][:5])
+        ac.setText(listingTableSetupTypeButton, 'Other Tracks')
+        updatePageSpinner(math.ceil(len(setups['otherTracks']) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+    else:
+        ac.log('TheSetupMarket logs | setups for trackSpecific: ' + str(len(setups['trackSpecific'])))
+        activeSetupType = 'trackSpecific'
+        updateSetupsListingTable(setups['trackSpecific'][:5])
+        ac.setText(listingTableSetupTypeButton, 'Current Track')
+        updatePageSpinner(math.ceil(len(setups['trackSpecific']) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+
+
+
+def onDownloadButton1Clicked(*args):
+    ac.log('TheSetupMarket logs | dl button1 clicked')
+    if eventInfos['setupIds'][0] != '':
+        tsm.downloadSetup(eventInfos['setupIds'][0], eventInfos['setupFilenames'][0], currentCarName, currentTrackBaseName, currentTrackLayout)
+
+def onDownloadButton2Clicked(*args):
+    ac.log('TheSetupMarket logs | dl button2 clicked')
+    if eventInfos['setupIds'][1] != '':
+        tsm.downloadSetup(eventInfos['setupIds'][1], eventInfos['setupFilenames'][1], currentCarName, currentTrackBaseName, currentTrackLayout)
+
+def onDownloadButton3Clicked(*args):
+    ac.log('TheSetupMarket logs | dl button3 clicked')
+    if eventInfos['setupIds'][2] != '':
+        tsm.downloadSetup(eventInfos['setupIds'][2], eventInfos['setupFilenames'][2], currentCarName, currentTrackBaseName, currentTrackLayout)
+
+def onDownloadButton4Clicked(*args):
+    ac.log('TheSetupMarket logs | dl button4 clicked')
+    if eventInfos['setupIds'][3] != '':
+        tsm.downloadSetup(eventInfos['setupIds'][3], eventInfos['setupFilenames'][3], currentCarName, currentTrackBaseName, currentTrackLayout)
+
+def onDownloadButton5Clicked(*args):
+    ac.log('TheSetupMarket logs | dl button5 clicked')
+    if eventInfos['setupIds'][4] != '':
+        tsm.downloadSetup(eventInfos['setupIds'][4], eventInfos['setupFilenames'][4], currentCarName, currentTrackBaseName, currentTrackLayout)
+
+@async
+def onRefreshSetupsButtonClick(*args):
     global setups
+    setups = tsm.getSetups(currentCarName, currentTrackFullName)
 
-    fromIndex = x * GUIConfig.GUIConstants['setupsPerPage'] - GUIConfig.GUIConstants['setupsPerPage']
-    toIndex = x * GUIConfig.GUIConstants['setupsPerPage']
+    # If there is setups for the default type, update the table.
+    if len(setups[activeSetupType]) > 0:
 
-    updateSetupsListingTable('otherTracks', setups['otherTracks'][fromIndex:toIndex])
+        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
+        if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
+            # ac.log(str(setupType)+' setups pages: '+str(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']))
+
+            updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+        else:
+            # ac.log('One page only')
+            updateSetupsListingTable(setups[activeSetupType])
+
+    # if there is no setups for this type, show empty table label.
+    else:
+        # ac.log('No '+str(setupType)+' setups')
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        updateSetupsListingTable(setups[activeSetupType][:5])

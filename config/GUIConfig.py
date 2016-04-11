@@ -20,76 +20,26 @@ GUIConstants = {
     'setupsPerPage': 5,
     'tableLayout': {
         'cellHeight': 21,
-        'trackSpecific': {
-            'xPos': {
-                'dl_cell': 10,
-                'author_cell': 35,
-                'trim_cell': 260,
-                'bestlap_cell': 310,
-                'rating_cell': 390,
-                'downloads_cell': 460,
-                'acversion_cell': 500,
-                'version_cell': 530
-            },
-            'cellXSize': {
-                'dl_cell': 25,
-                'author_cell': 225,
-                'trim_cell': 50,
-                'bestlap_cell': 90,
-                'rating_cell': 70,
-                'downloads_cell': 40,
-                'acversion_cell': 30,
-                'version_cell': 60
-            },
-            'startingYPosition': 75
+        'xPos': {
+            'dl_cell': 10,
+            'author_cell': 35,
+            'trim_cell': 260,
+            'bestlap_cell': 310,
+            'rating_cell': 390,
+            'downloads_cell': 460,
+            'acversion_cell': 500,
+            'version_cell': 530
         },
-        'anyTracks': {
-            'xPos': {
-                'dl_cell': 10,
-                'author_cell': 35,
-                'trim_cell': 260,
-                'bestlap_cell': 310,
-                'rating_cell': 390,
-                'downloads_cell': 460,
-                'acversion_cell': 500,
-                'version_cell': 530
-            },
-            'cellXSize': {
-                'dl_cell': 25,
-                'author_cell': 225,
-                'trim_cell': 50,
-                'bestlap_cell': 90,
-                'rating_cell': 70,
-                'downloads_cell': 40,
-                'acversion_cell': 30,
-                'version_cell': 60
-            },
-            'startingYPosition': 244
+        'cellXSize': {
+            'dl_cell': 25,
+            'author_cell': 225,
+            'trim_cell': 50,
+            'bestlap_cell': 90,
+            'rating_cell': 70,
+            'downloads_cell': 40,
+            'acversion_cell': 30,
+            'version_cell': 60
         },
-        'otherTracks': {
-            'xPos': {
-                'dl_cell': 10,
-                'track_cell': 35,
-                'author_cell': 160,
-                'trim_cell': 260,
-                'bestlap_cell': 310,
-                'rating_cell': 390,
-                'downloads_cell': 460,
-                'acversion_cell': 500,
-                'version_cell': 530
-            },
-            'cellXSize': {
-                'dl_cell': 25,
-                'track_cell': 125,
-                'author_cell': 100,
-                'trim_cell': 50,
-                'bestlap_cell': 90,
-                'rating_cell': 70,
-                'downloads_cell': 40,
-                'acversion_cell': 30,
-                'version_cell': 60
-            },
-            'startingYPosition': 411
-        }
+        'startingYPosition': 75
     }
 }
