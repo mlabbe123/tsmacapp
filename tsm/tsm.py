@@ -4,7 +4,7 @@ import traceback
 import ctypes.wintypes
 from ctypes.wintypes import MAX_PATH
 from os.path import dirname, realpath
-import configparser
+#import configparser
 from operator import itemgetter, attrgetter, methodcaller
 import functools
 import threading
@@ -24,14 +24,14 @@ try:
 except Exception as e:
     ac.log('TheSetupMarket logs | error loading requests: '+traceback.format_exc())
 
-config_path = dirname(realpath(__file__))
+#config_path = dirname(realpath(__file__))
 
-config_ini_file = config_path + '/../config/config.ini'
+#config_ini_file = config_path + '/../config/config.ini'
 
-config = configparser.ConfigParser()
-config.read(config_ini_file, encoding='utf-8')
-config.sections()
-sim_versions = config['filters']['SimVersion']
+#config = configparser.ConfigParser()
+#config.read(config_ini_file, encoding='utf-8')
+#config.sections()
+#sim_versions = config['filters']['SimVersion']
 
 def getSetups(car_code, track_code):
     ac.log('TheSetupMarket logs | car_code: '+car_code)
