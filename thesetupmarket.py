@@ -26,7 +26,7 @@ def async(func):
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackFullName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackFullName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType, allSetupsFileNamesInFolder, currentUploadFileName
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 800, 320)
@@ -133,14 +133,15 @@ def acMain(ac_version):
     else:
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
 
-    tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
-
+    # Move this above initGUI to define currentUploadFileName before the button creation
+    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+    currentUploadFileName = allSetupsFileNamesInFolder[0]
 
     return "The Setup Market"
 
 
 def initGUI(appWindow):
-    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType
+    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType, fileSelectorButton
 
     ###################################
     ### Download section            ###
@@ -233,7 +234,6 @@ def initGUI(appWindow):
     ac.setPosition(listingTableSetupTypeButton, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
     ac.setSize(listingTableSetupTypeButton, 140, 22)
     ac.setText(listingTableSetupTypeButton, 'Current Track')
-    ac.setVisible(listingTableSetupTypeButton, 1)
     ac.setBackgroundColor(listingTableSetupTypeButton, 1, 1, 1)
     ac.setFontColor(listingTableSetupTypeButton, 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(listingTableSetupTypeButton, 1)
@@ -261,22 +261,46 @@ def initGUI(appWindow):
     section4Title = ac.addLabel(appWindow, "/Upload setup")
     ac.setPosition(section4Title, 10, 235)
 
-    # Add upload section message
-    uploadText1 = ac.addLabel(appWindow, "Still in development, coming soon (tm)")
-    ac.setPosition(uploadText1, 280, 256)
+    # Add file selector label
+    fileSelectorLabel = ac.addLabel(appWindow, 'Select a file to upload (click to cycle files)')
+    ac.setPosition(fileSelectorLabel, 10, 260)
+    ac.setSize(fileSelectorLabel, 300, 22)
 
-    # MINI SEPARATOR
-    miniseparator = ac.addLabel(appWindow, '')
-    ac.setSize(miniseparator, 100, 1)
-    ac.setBackgroundColor(miniseparator, 1, 1, 1)
-    ac.setBackgroundOpacity(miniseparator, 1)
-    ac.drawBackground(miniseparator, 1)
-    ac.drawBorder(miniseparator, 0)
-    ac.setVisible(miniseparator, 1)
-    ac.setPosition(miniseparator, 352, 282)
+    # Add file selector button
+    fileSelectorButton = ac.addButton(appWindow, '')
+    ac.setPosition(fileSelectorButton, 10, 282)
+    ac.setSize(fileSelectorButton, 300, 22)
+    ac.setText(fileSelectorButton, currentUploadFileName)
+    ac.addOnClickedListener(fileSelectorButton, onFileSelectorButtonClick)
 
-    uploadText2 = ac.addLabel(appWindow, "In the meantime, please create an account at thesetupmarket.com to upload setups.")
-    ac.setPosition(uploadText2, 123, 286)
+    # Add setup trim selector label
+    trimSelectorButtonLabel = ac.addLabel(appWindow, 'Select a trim:')
+    ac.setPosition(trimSelectorButtonLabel, 350, 260)
+    ac.setSize(trimSelectorButtonLabel, 75, 22)
+
+    # Setting up the upload setup trim selector
+    trimSelectorButton = ac.addButton(appWindow, '')
+    ac.setPosition(trimSelectorButton, 350, 282)
+    ac.setSize(trimSelectorButton, 75, 22)
+    ac.setText(trimSelectorButton, 'Base')
+    ac.setBackgroundColor(trimSelectorButton, 1, 1, 1)
+    ac.setFontColor(trimSelectorButton, 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(trimSelectorButton, 1)
+    ac.drawBackground(trimSelectorButton, 1)
+    ac.drawBorder(trimSelectorButton, 0)
+    ac.addOnClickedListener(trimSelectorButton, onTrimSelectorButtonClick)
+
+    # Setting up the upload button
+    uploadButton = ac.addButton(appWindow, '')
+    ac.setPosition(uploadButton, 715, 282)
+    ac.setSize(uploadButton, 75, 22)
+    ac.setText(uploadButton, 'Upload')
+    ac.setBackgroundColor(uploadButton, 0.25098, 0.66274, 0.66274)
+    ac.setFontColor(uploadButton, 1, 1, 1, 1)
+    ac.setBackgroundOpacity(uploadButton, 1)
+    ac.drawBackground(uploadButton, 1)
+    ac.drawBorder(uploadButton, 0)
+    ac.addOnClickedListener(uploadButton, onUploadButtonClick)
 
 
 def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
@@ -474,3 +498,24 @@ def onRefreshSetupsButtonClick(*args):
         # ac.log('No '+str(setupType)+' setups')
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
         updateSetupsListingTable(setups[activeSetupType][:5])
+
+
+def onFileSelectorButtonClick(*args):
+    global currentUploadFileName
+    ac.log('onFileSelectorButtonClick')
+
+    currentIndex = allSetupsFileNamesInFolder.index(currentUploadFileName)
+
+    if allSetupsFileNamesInFolder[currentIndex + 1]:
+        uploadFileName = allSetupsFileNamesInFolder[currentIndex + 1]
+    else:
+        uploadFileName = allSetupsFileNamesInFolder[0]
+
+    ac.setText(fileSelectorButton, uploadFileName)
+
+
+def onTrimSelectorButtonClick(*args):
+    ac.log('onFileSelectorButtonClick')
+
+def onUploadButtonClick(*args):
+    ac.log('onFileSelectorButtonClick')
