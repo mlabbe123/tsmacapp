@@ -128,18 +128,3 @@ def extract_sim_version(setup):
         return setup['sim_version']
     except KeyError:
         return 0
-
-
-def getAllSetupsFromFolder(car_ac_code, track_baseName):
-    # List setup files in current track folder
-    allSetupFiles = os.listdir(get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName)
-    ac.log('TheSetupMarket logs | all setups in folder: ' + str(allSetupFiles))
-
-    # Build a new list without all files downloaded by the app (files starting with TSM)
-    allSetupFilesNotTSM = []
-
-    for setupFile in allSetupFiles:
-        if 'TSM-ac' not in setupFile:
-            allSetupFilesNotTSM.append(setupFile)
-
-    ac.log('TheSetupMarket logs | all setups in folder not TSM: ' + str(allSetupFilesNotTSM))

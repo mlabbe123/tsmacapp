@@ -133,8 +133,6 @@ def acMain(ac_version):
     else:
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
 
-    tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
-
 
     return "The Setup Market"
 
