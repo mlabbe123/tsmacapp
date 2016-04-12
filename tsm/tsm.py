@@ -19,6 +19,7 @@ def async(func):
         return t
     return wrapper
 
+
 try: 
     import requests
 except Exception as e:
@@ -33,9 +34,10 @@ except Exception as e:
 #config.sections()
 #sim_versions = config['filters']['SimVersion']
 
-def getSetups(car_code, track_code):
+
+def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
     ac.log('TheSetupMarket logs | car_code: '+car_code)
-    ac.log('TheSetupMarket logs | track_code: '+track_code)
+    ac.log('TheSetupMarket logs | track_code: '+currentTrackBaseName + '-' + currentTrackLayout)
 
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
@@ -47,19 +49,22 @@ def getSetups(car_code, track_code):
     anyTracksSetups = []
     otherTrackSetups = []
 
+    # Get current track full name, matching the DB ac_code.
+    # if ac.getTrackConfiguration(0) != '':
+    #     currentTrackFullName = currentTrackBaseName + '-' + currentTrackLayout
+    # else:
+    #     currentTrackFullName = currentTrackBaseName
+
     #ac.log(str(setups.sort(key=extract_sim_version)))
 
     for setup in setups:
-        # trackSpecificSetups.append(setup)
-        # anyTracksSetups.append(setup)
-        # otherTrackSetups.append(setup)
 
         if setup['car']['ac_code'] == car_code:
-            if setup['track']['ac_code'] == track_code:
+            if currentTrackBaseName in setup['track']['ac_code']:
                 trackSpecificSetups.append(setup)
             elif setup['track']['_id'] == '55db6db13cc3a26dcae7116d':
                 anyTracksSetups.append(setup)
-            elif setup['track']['ac_code'] != track_code and setup['track']['_id'] != '55db6db13cc3a26dcae7116d':
+            elif not currentTrackBaseName in setup['track']['ac_code'] and setup['track']['_id'] != '55db6db13cc3a26dcae7116d':
                 otherTrackSetups.append(setup)
 
     ac.log('TheSetupMarket logs | trackSpecificSetups count: ' + str(len(trackSpecificSetups)))
@@ -67,9 +72,9 @@ def getSetups(car_code, track_code):
     ac.log('TheSetupMarket logs | otherTrackSetups count: ' + str(len(otherTrackSetups)))
 
     categorizedSetupsObj = {}
-    categorizedSetupsObj['trackSpecific'] = trackSpecificSetups
-    categorizedSetupsObj['anyTracks'] = anyTracksSetups
-    categorizedSetupsObj['otherTracks'] = otherTrackSetups
+    categorizedSetupsObj['trackSpecific'] = list(reversed(trackSpecificSetups))
+    categorizedSetupsObj['anyTracks'] = list(reversed(anyTracksSetups))
+    categorizedSetupsObj['otherTracks'] = list(reversed(otherTrackSetups))
 
     return categorizedSetupsObj
 
@@ -98,6 +103,7 @@ def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_
     else:
         ac.log('TheSetupMarket logs | setupid: ' + setup_id + 'error while downloading')
 
+
 def get_personal_folder():
     dll = ctypes.windll.shell32
     buf = ctypes.create_unicode_buffer(MAX_PATH + 1)
@@ -105,6 +111,7 @@ def get_personal_folder():
         return buf.value
     else:
         raise Exception('Could not find "Documents" folder')
+
 
 def filterSetups(setupList, predicateName, predicateValue):
     filteredSetupList = []
@@ -115,8 +122,24 @@ def filterSetups(setupList, predicateName, predicateValue):
 
     return filteredSetupList
 
+
 def extract_sim_version(setup):
     try:
         return setup['sim_version']
     except KeyError:
         return 0
+
+
+def getAllSetupsFromFolder(car_ac_code, track_baseName):
+    # List setup files in current track folder
+    allSetupFiles = os.listdir(get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName)
+    ac.log('TheSetupMarket logs | all setups in folder: ' + str(allSetupFiles))
+
+    # Build a new list without all files downloaded by the app (files starting with TSM)
+    allSetupFilesNotTSM = []
+
+    for setupFile in allSetupFiles:
+        if 'TSM-ac' not in setupFile:
+            allSetupFilesNotTSM.append(setupFile)
+
+    ac.log('TheSetupMarket logs | all setups in folder not TSM: ' + str(allSetupFilesNotTSM))

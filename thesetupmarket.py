@@ -1,7 +1,6 @@
 import sys
 import ac
 import traceback
-import functools
 import math
 from collections import OrderedDict
 
@@ -25,44 +24,12 @@ def async(func):
         return t
     return wrapper
 
-# downloadButton = 0
-# class downloadButtonEvent:
-#     def __init__(self, labelCtrl, index):
-#         self.event = functools.partial(self.downloadSetup, setupId = eventInfos['setupIds'][index], setupFilename = eventInfos['setupFilenames'][index])
-#         ac.addOnClickedListener(labelCtrl, self.event)
-#
-#
-#     def downloadSetup(self, x, y, setupId, setupFilename):
-#         global currentCarName, currentTrackBaseName, currentTrackLayout
-#
-#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
-
-# class testEvent:
-#     def __init__(self, labelCtrl, setupId, setupFilename):
-#         self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
-#         ac.addOnClickedListener(labelCtrl, self.event)
-#
-#
-#     def downloadSetup(self, x, y, setupId, setupFilename):
-#         global currentCarName, currentTrackBaseName, currentTrackLayout
-#
-#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currenclass testEvent:
-#     def __init__(self, labelCtrl, setupId, setupFilename):
-#         self.event = functools.partial(self.downloadSetup, setupId = setupId, setupFilename = setupFilename)
-#         ac.addOnClickedListener(labelCtrl, self.event)
-#
-#
-#     def downloadSetup(self, x, y, setupId, setupFilename):
-#         global currentCarName, currentTrackBaseName, currentTrackLayout
-#
-#         tsm.downloadSetup(setupId, setupFilename, currentCarName, currentTrackBaseName, currentTrackLayout)
-
 
 def acMain(ac_version):
     global appWindow, currentCarName, currentTrackBaseName, currentTrackFullName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 600, 320)
+    ac.setSize(appWindow, 800, 320)
 
     # downloadButton = 0
 
@@ -82,6 +49,7 @@ def acMain(ac_version):
     listingTable = OrderedDict([
         (1, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
             'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -92,6 +60,7 @@ def acMain(ac_version):
         }),
         (2, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
             'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -102,6 +71,7 @@ def acMain(ac_version):
         }),
         (3, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
             'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -112,6 +82,7 @@ def acMain(ac_version):
         }),
         (4, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
             'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -122,6 +93,7 @@ def acMain(ac_version):
         }),
         (5, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
             'bestlap_cell': ac.addLabel(appWindow, ''),
@@ -142,14 +114,8 @@ def acMain(ac_version):
      # Set the base GUI
     initGUI(appWindow)
 
-    # Get current track name.
-    if ac.getTrackConfiguration(0) != '':
-        currentTrackFullName = ac.getTrackName(0) + '-' + ac.getTrackConfiguration(0)
-    else:
-        currentTrackFullName = ac.getTrackName(0)
-
     # Get setups for current car and track.
-    setups = tsm.getSetups(currentCarName, currentTrackFullName)
+    setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
     # If there is setups for the default type, update the table.
     if len(setups[activeSetupType]) > 0:
@@ -165,8 +131,10 @@ def acMain(ac_version):
 
     # if there is no setups for this type, show empty table label.
     else:
-        # ac.log('No '+str(setupType)+' setups')
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+
+    tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+
 
     return "The Setup Market"
 
@@ -184,7 +152,7 @@ def initGUI(appWindow):
 
     # Setting up the refresh setups button
     refreshSetupsButton = ac.addButton(appWindow, '')
-    ac.setPosition(refreshSetupsButton, 520, 30)
+    ac.setPosition(refreshSetupsButton, 720, 30)
     ac.setSize(refreshSetupsButton, 70, 20)
     ac.setText(refreshSetupsButton, 'Refresh')
     ac.setVisible(refreshSetupsButton, 1)
@@ -196,14 +164,15 @@ def initGUI(appWindow):
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
-    addTableCell(appWindow, '', 35, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 53, 'center')
-    addTableCell(appWindow, 'Author', 225, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 53, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 260, 53, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 310, 53, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 390, 53, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 460, 53, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 53, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 53, 'center')
+    addTableCell(appWindow, '', 25, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 53, 'center')
+    addTableCell(appWindow, 'Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 53, 'center')
+    addTableCell(appWindow, 'Author', 175, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'],285, 53, 'center')
+    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 460, 53, 'center')
+    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 510, 53, 'center')
+    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 590, 53, 'center')
+    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 660, 53, 'center')
+    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 700, 53, 'center')
+    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 730, 53, 'center')
 
     # Init the setups listing table with empty labels
     yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
@@ -244,14 +213,14 @@ def initGUI(appWindow):
 
         ac.setText(labelCtrl, labelText)
         ac.setPosition(labelCtrl, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
-        ac.setSize(labelCtrl, 580, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
+        ac.setSize(labelCtrl, 780, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
         ac.drawBorder(labelCtrl, 0)
         ac.setVisible(labelCtrl, 0)
         ac.setFontAlignment(labelCtrl, 'center')
 
     # SEPARATOR BEFORE SPINNERS
     separator1 = ac.addLabel(appWindow, '')
-    ac.setSize(separator1, 580, 1)
+    ac.setSize(separator1, 780, 1)
     ac.setBackgroundColor(separator1, 1, 1, 1)
     ac.setBackgroundOpacity(separator1, 1)
     ac.drawBackground(separator1, 1)
@@ -274,13 +243,13 @@ def initGUI(appWindow):
 
     # Setting up the setups listing table page spinner
     listingTablePageSpinner = ac.addSpinner(appWindow, '')
-    ac.setPosition(listingTablePageSpinner, 530, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
+    ac.setPosition(listingTablePageSpinner, 730, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
     ac.setSize(listingTablePageSpinner, 60, 20)
     ac.setVisible(listingTablePageSpinner, 0)
 
     # SEPARATOR
     separator = ac.addLabel(appWindow, '')
-    ac.setSize(separator, 600, 2)
+    ac.setSize(separator, 800, 2)
     ac.setBackgroundColor(separator, 1, 1, 1)
     ac.setBackgroundOpacity(separator, 1)
     ac.drawBackground(separator, 1)
@@ -294,7 +263,7 @@ def initGUI(appWindow):
 
     # Add upload section message
     uploadText1 = ac.addLabel(appWindow, "Still in development, coming soon (tm)")
-    ac.setPosition(uploadText1, 180, 256)
+    ac.setPosition(uploadText1, 280, 256)
 
     # MINI SEPARATOR
     miniseparator = ac.addLabel(appWindow, '')
@@ -304,10 +273,10 @@ def initGUI(appWindow):
     ac.drawBackground(miniseparator, 1)
     ac.drawBorder(miniseparator, 0)
     ac.setVisible(miniseparator, 1)
-    ac.setPosition(miniseparator, 252, 282)
+    ac.setPosition(miniseparator, 352, 282)
 
     uploadText2 = ac.addLabel(appWindow, "In the meantime, please create an account at thesetupmarket.com to upload setups.")
-    ac.setPosition(uploadText2, 23, 286)
+    ac.setPosition(uploadText2, 123, 286)
 
 
 def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
@@ -366,13 +335,11 @@ def updateSetupsListingTable(setups):
             ac.setVisible(labelCtrl, 1)
 
             if cellName == 'dl_cell':
-                # ac.log('Download cell')
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':
-                # ac.log(setup['author']['display_name'])
-                ac.setText(labelCtrl, setup['author']['display_name'])
+                ac.setText(labelCtrl, setup['author']['display_name'][0:20])
             elif cellName == 'trim_cell' :
                 # ac.log(setup['type'])
                 ac.setText(labelCtrl, setup['type'])
@@ -381,7 +348,6 @@ def updateSetupsListingTable(setups):
                 if setup['best_time'] != '':
                     bestlap = setup['best_time']
 
-                # ac.log(bestlap)
                 ac.setText(labelCtrl, bestlap)
             elif cellName == 'rating_cell':
                 totalRating = 0
@@ -394,17 +360,13 @@ def updateSetupsListingTable(setups):
                 else:
                     rating = str(totalRating)
 
-                # ac.log('Rating: '+str(rating))
                 ac.setText(labelCtrl, str(rating))
 
             elif cellName == 'downloads_cell':
-                # ac.log('Downloads: '+str(setup['downloads']))
                 ac.setText(labelCtrl, str(setup['downloads']))
             elif cellName == 'acversion_cell':
-                # ac.log('Ac version: '+str(setup['sim_version']))
                 ac.setText(labelCtrl, str(setup['sim_version']))
             elif cellName == 'version_cell':
-                # ac.log('Version: v'+str(setup['version']))
                 ac.setText(labelCtrl, 'v'+str(setup['version']))
 
         rowNumber += 1
