@@ -26,7 +26,7 @@ def async(func):
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackFullName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType, allSetupsFileNamesInFolder, currentUploadFileName
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType, uploadSectionElements, currentUploadTrim, currentUploadBaseline
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 800, 320)
@@ -104,6 +104,20 @@ def acMain(ac_version):
         })
     ])
 
+    # Set the GUI elements for the upload section
+    # TODO: Set these elements on load, hidden. Create a function refreshUploadSection that shows/hides elements and change text for the errorMessageLabel and the fileSelectorButton. Create a helper function to show/hide an element.
+    uploadSectionElements = {
+        'fileSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'fileSelectorButton': ac.addButton(appWindow, ''),
+        'trimSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'trimSelectorButton': ac.addButton(appWindow, ''),
+        'baselineSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'baselineSelectorButton': ac.addButton(appWindow, ''),
+        'uploadButton': ac.addButton(appWindow, ''),
+        'uploadMessageLabel': ac.addLabel(appWindow, ''),
+        'refreshUploadGUIButton': ac.addButton(appWindow, '')
+    }
+
     # Get current car/track/layout.
     currentCarName = ac.getCarName(0)
     currentTrackBaseName = ac.getTrackName(0)
@@ -111,8 +125,11 @@ def acMain(ac_version):
     # Set the default active setup type
     activeSetupType = 'trackSpecific'
 
-     # Set the base GUI
+    # Set the base GUI
     initGUI(appWindow)
+
+    # Init upload section variables
+    initUploadSection()
 
     # Get setups for current car and track.
     setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
@@ -133,15 +150,70 @@ def acMain(ac_version):
     else:
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
 
-    # Move this above initGUI to define currentUploadFileName before the button creation
-    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
-    currentUploadFileName = allSetupsFileNamesInFolder[0]
-
     return "The Setup Market"
 
 
+def initUploadSection():
+    global userSteamCommunityID, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId
+
+    ##########################
+    # Set the static variables
+    ##########################
+    uploadAvailability = True
+    currentUploadTrim = 'Qualy'
+    currentUploadBaseline = False
+
+    if currentTrackLayout != '':
+        track_ac_code = currentTrackBaseName + '-' + currentTrackLayout
+    else:
+        track_ac_code = currentTrackBaseName
+
+    ##########################
+    # Set the dynamic variables
+    ##########################
+
+    # Get the user steam community ID
+    userSteamCommunityID = tsm.getUserSteamCommunityIDFromLog()
+
+    # Check TSM database to see if user exists
+    userExists = tsm.checkIfUserExistsOnTSM(userSteamCommunityID)
+
+    # Get the active AC version
+    current_ac_version = tsm.get_ac_version_from_api()
+
+    # Get the user steamID
+
+    # Get the carID for the currentCarName
+    current_carId = tsm.get_carid_from_api(currentCarName)
+    ac.log('TheSetupMarket logs | current_carId = ' + str(current_carId))
+
+    # Get the trackID for the track_ac_code
+    current_trackId = tsm.get_trackid_from_api(track_ac_code)
+    ac.log('TheSetupMarket logs | current_trackId = ' + str(current_trackId))
+
+    # Get all the files names in the current track folder
+    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+
+    # Set the current upload filename
+    if len(allSetupsFileNamesInFolder) > 0:
+        currentUploadFileName = allSetupsFileNamesInFolder[0]
+    else:
+        currentUploadFileName = 'No file in track folder'
+
+    # Check if we have errors that would break the upload function. If so, disable uploading.
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamCommunityID or not userExists:
+        ac.log('TheSetupMarket logs | disabling uploading...')
+        uploadAvailability = False
+
+    # Prepare the upload section GUI.
+    initUploadSectionGUI()
+
+    # Put the right GUI config and values.
+    refreshUploadSection()
+
+
 def initGUI(appWindow):
-    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType, fileSelectorButton
+    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType
 
     ###################################
     ### Download section            ###
@@ -261,46 +333,142 @@ def initGUI(appWindow):
     section4Title = ac.addLabel(appWindow, "/Upload setup")
     ac.setPosition(section4Title, 10, 235)
 
-    # Add file selector label
-    fileSelectorLabel = ac.addLabel(appWindow, 'Select a file to upload (click to cycle files)')
-    ac.setPosition(fileSelectorLabel, 10, 260)
-    ac.setSize(fileSelectorLabel, 300, 22)
+    # Add reset upload section button
+    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 720, 235)
+    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
+    ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
+    ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 1)
+    ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
+    ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 0)
+    ac.addOnClickedListener(uploadSectionElements['refreshUploadGUIButton'], onRefreshUploadSectionButtonClick)
+    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
 
-    # Add file selector button
-    fileSelectorButton = ac.addButton(appWindow, '')
-    ac.setPosition(fileSelectorButton, 10, 282)
-    ac.setSize(fileSelectorButton, 300, 22)
-    ac.setText(fileSelectorButton, currentUploadFileName)
-    ac.addOnClickedListener(fileSelectorButton, onFileSelectorButtonClick)
 
-    # Add setup trim selector label
-    trimSelectorButtonLabel = ac.addLabel(appWindow, 'Select a trim:')
-    ac.setPosition(trimSelectorButtonLabel, 350, 260)
-    ac.setSize(trimSelectorButtonLabel, 75, 22)
+def initUploadSectionGUI():
 
-    # Setting up the upload setup trim selector
-    trimSelectorButton = ac.addButton(appWindow, '')
-    ac.setPosition(trimSelectorButton, 350, 282)
-    ac.setSize(trimSelectorButton, 75, 22)
-    ac.setText(trimSelectorButton, 'Base')
-    ac.setBackgroundColor(trimSelectorButton, 1, 1, 1)
-    ac.setFontColor(trimSelectorButton, 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(trimSelectorButton, 1)
-    ac.drawBackground(trimSelectorButton, 1)
-    ac.drawBorder(trimSelectorButton, 0)
-    ac.addOnClickedListener(trimSelectorButton, onTrimSelectorButtonClick)
+    ac.log('TheSetupMarket logs | initUploadSectionGUI: Init the upload section GUI')
 
-    # Setting up the upload button
-    uploadButton = ac.addButton(appWindow, '')
-    ac.setPosition(uploadButton, 715, 282)
-    ac.setSize(uploadButton, 75, 22)
-    ac.setText(uploadButton, 'Upload')
-    ac.setBackgroundColor(uploadButton, 0.25098, 0.66274, 0.66274)
-    ac.setFontColor(uploadButton, 1, 1, 1, 1)
-    ac.setBackgroundOpacity(uploadButton, 1)
-    ac.drawBackground(uploadButton, 1)
-    ac.drawBorder(uploadButton, 0)
-    ac.addOnClickedListener(uploadButton, onUploadButtonClick)
+    # Configure the error message label
+    ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 275)
+    ac.setSize(uploadSectionElements['uploadMessageLabel'], 800, 22)
+    ac.setFontAlignment(uploadSectionElements['uploadMessageLabel'], 'center')
+    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
+
+    # Configure the file selector label
+    ac.setPosition(uploadSectionElements['fileSelectorButtonLabel'], 10, 260)
+    ac.setSize(uploadSectionElements['fileSelectorButtonLabel'], 300, 22)
+    ac.setText(uploadSectionElements['fileSelectorButtonLabel'], 'Select a file to upload (click to cycle files)')
+    ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
+
+    # Configure the file selector button
+    ac.setPosition(uploadSectionElements['fileSelectorButton'], 10, 282)
+    ac.setSize(uploadSectionElements['fileSelectorButton'], 300, 22)
+    ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
+    ac.addOnClickedListener(uploadSectionElements['fileSelectorButton'], onFileSelectorButtonClick)
+    ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
+
+    # Configure the setup trim selector label
+    ac.setPosition(uploadSectionElements['trimSelectorButtonLabel'], 350, 260)
+    ac.setSize(uploadSectionElements['trimSelectorButtonLabel'], 75, 22)
+    ac.setText(uploadSectionElements['trimSelectorButtonLabel'], 'Select a trim:')
+    ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
+
+    # Configure the upload setup trim selector
+    ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 282)
+    ac.setSize(uploadSectionElements['trimSelectorButton'], 75, 22)
+    ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
+    ac.setBackgroundColor(uploadSectionElements['trimSelectorButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionElements['trimSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['trimSelectorButton'], 1)
+    ac.drawBackground(uploadSectionElements['trimSelectorButton'], 1)
+    ac.drawBorder(uploadSectionElements['trimSelectorButton'], 0)
+    ac.addOnClickedListener(uploadSectionElements['trimSelectorButton'], onTrimSelectorButtonClick)
+    ac.setVisible(uploadSectionElements['trimSelectorButton'], 0)
+
+    # Configure the setup baseline selector label
+    ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 450, 260)
+    ac.setSize(uploadSectionElements['baselineSelectorButtonLabel'], 75, 22)
+    ac.setText(uploadSectionElements['baselineSelectorButtonLabel'], 'Track Specific?')
+    ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
+
+    # Configure the baseline selector button
+    ac.setPosition(uploadSectionElements['baselineSelectorButton'], 450, 282)
+    ac.setSize(uploadSectionElements['baselineSelectorButton'], 75, 22)
+    ac.setText(uploadSectionElements['baselineSelectorButton'], 'Yes')
+    ac.setBackgroundColor(uploadSectionElements['baselineSelectorButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['baselineSelectorButton'], 1)
+    ac.drawBackground(uploadSectionElements['baselineSelectorButton'], 1)
+    ac.drawBorder(uploadSectionElements['baselineSelectorButton'], 0)
+    ac.addOnClickedListener(uploadSectionElements['baselineSelectorButton'], onBaselineSelectorButtonClick)
+    ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
+
+    # Configure the upload button
+    ac.setPosition(uploadSectionElements['uploadButton'], 715, 282)
+    ac.setSize(uploadSectionElements['uploadButton'], 75, 22)
+    ac.setText(uploadSectionElements['uploadButton'], 'Upload')
+    ac.setBackgroundColor(uploadSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
+    ac.setFontColor(uploadSectionElements['uploadButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['uploadButton'], 1)
+    ac.drawBackground(uploadSectionElements['uploadButton'], 1)
+    ac.drawBorder(uploadSectionElements['uploadButton'], 0)
+    ac.addOnClickedListener(uploadSectionElements['uploadButton'], onUploadButtonClick)
+    ac.setVisible(uploadSectionElements['uploadButton'], 0)
+
+
+def refreshUploadSection():
+    if uploadAvailability:
+        ac.log('TheSetupMarket logs | refreshUploadSection : if uploadAvailability:')
+        ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
+        ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
+        showUploadGUI()
+    else:
+        ac.log('TheSetupMarket logs | refreshUploadSection : else uploadAvailability:')
+        if not userExists:
+            ac.log('TheSetupMarket logs | refreshUploadSection: User steamCommunityID not found in TSM DB')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'Go to thesetupmarket.com to create an account and link it with your steam account')
+            ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+        elif not current_carId:
+            ac.log('TheSetupMarket logs | refreshUploadSection: The car is not available for uploads')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'The car is not available for upload yet')
+            ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+        elif not current_trackId:
+            ac.log('TheSetupMarket logs | refreshUploadSection: The track is not available for uploads')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'The track is not available for uploads yet')
+            ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+        elif not current_ac_version:
+            ac.log('TheSetupMarket logs | refreshUploadSection: The current_ac_version is not available for uploads')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'The current_ac_version is not available for uploads yet')
+            ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+        elif len(allSetupsFileNamesInFolder) == 0:
+            ac.log('TheSetupMarket logs | refreshUploadSection: There are no files in the current track setups folder for this car')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'There are no files to upload in the current track setups folder for this car')
+            ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
+
+        hideUploadGUI()
+        ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
+
+
+def hideUploadGUI():
+    ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
+    ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
+    ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
+    ac.setVisible(uploadSectionElements['trimSelectorButton'], 0)
+    ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
+    ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
+    ac.setVisible(uploadSectionElements['uploadButton'], 0)
+
+
+def showUploadGUI():
+    ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 1)
+    ac.setVisible(uploadSectionElements['fileSelectorButton'], 1)
+    ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 1)
+    ac.setVisible(uploadSectionElements['trimSelectorButton'], 1)
+    ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 1)
+    ac.setVisible(uploadSectionElements['baselineSelectorButton'], 1)
+    ac.setVisible(uploadSectionElements['uploadButton'], 1)
 
 
 def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
@@ -479,7 +647,7 @@ def onDownloadButton5Clicked(*args):
 @async
 def onRefreshSetupsButtonClick(*args):
     global setups
-    setups = tsm.getSetups(currentCarName, currentTrackFullName)
+    setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
     # If there is setups for the default type, update the table.
     if len(setups[activeSetupType]) > 0:
@@ -504,18 +672,75 @@ def onFileSelectorButtonClick(*args):
     global currentUploadFileName
     ac.log('onFileSelectorButtonClick')
 
-    currentIndex = allSetupsFileNamesInFolder.index(currentUploadFileName)
+    if len(allSetupsFileNamesInFolder) > 0:
 
-    if allSetupsFileNamesInFolder[currentIndex + 1]:
-        uploadFileName = allSetupsFileNamesInFolder[currentIndex + 1]
-    else:
-        uploadFileName = allSetupsFileNamesInFolder[0]
+        currentIndex = allSetupsFileNamesInFolder.index(currentUploadFileName)
 
-    ac.setText(fileSelectorButton, uploadFileName)
+        if currentIndex + 1 < len(allSetupsFileNamesInFolder):
+            currentUploadFileName = allSetupsFileNamesInFolder[currentIndex + 1]
+        else:
+            currentUploadFileName = allSetupsFileNamesInFolder[0]
+
+        ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
 
 
 def onTrimSelectorButtonClick(*args):
-    ac.log('onFileSelectorButtonClick')
+    global currentUploadTrim
+
+    if currentUploadTrim == 'Qualy':
+        currentUploadTrim = 'Race'
+    elif currentUploadTrim == 'Race':
+        currentUploadTrim = 'Base'
+    else:
+        currentUploadTrim = 'Qualy'
+
+    ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
+
 
 def onUploadButtonClick(*args):
-    ac.log('onFileSelectorButtonClick')
+    ac.log('onUploadButtonClick')
+
+    tsm.uploadSetup(currentUploadFileName, currentUploadTrim, currentUploadBaseline, currentCarName, currentTrackBaseName, currentTrackLayout)
+
+
+def onBaselineSelectorButtonClick(*args):
+    global currentUploadBaseline
+
+    if currentUploadBaseline:
+        ac.log('TheSetupMarket logs | onBaselineSelectorButtonClick: if currentUploadBaseline')
+        currentUploadBaseline = False
+        ac.setText(uploadSectionElements['baselineSelectorButton'], 'Yes')
+    else:
+        ac.log('TheSetupMarket logs | onBaselineSelectorButtonClick: else currentUploadBaseline')
+        currentUploadBaseline = True
+        ac.setText(uploadSectionElements['baselineSelectorButton'], 'No')
+
+def onRefreshUploadSectionButtonClick(*args):
+    global allSetupsFileNamesInFolder, currentUploadFileName, currentUploadFileName, uploadAvailability
+
+    hideUploadGUI()
+    ac.setText(uploadSectionElements['uploadMessageLabel'], 'Loading...')
+    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
+
+    # Get all the files names in the current track folder
+    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+    ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: allSetupsFileNamesInFolder = ' + str(allSetupsFileNamesInFolder))
+
+    # Set the current upload filename
+    if len(allSetupsFileNamesInFolder) > 0:
+        currentUploadFileName = allSetupsFileNamesInFolder[0]
+    else:
+        currentUploadFileName = 'No file in track folder'
+
+    ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
+
+    # Check if we have errors that would break the upload function. If so, disable uploading.
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamCommunityID or not userExists:
+        ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: disabling uploading...')
+        uploadAvailability = False
+
+    else:
+        ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: enabling uploading...')
+        uploadAvailability = True
+
+    refreshUploadSection()
