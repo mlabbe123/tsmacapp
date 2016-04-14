@@ -369,14 +369,18 @@ def updateSetupsListingTable(setups):
 
         rowNumber += 1
 
-    ac.log('TheSetupMarket logs | eventInfos: ' + str(eventInfos))
-
     if len(setups) < GUIConfig.GUIConstants['setupsPerPage']:
         ac.log('TheSetupMarket logs | setups length less than 5. Length = ' + str(len(setups)))
         # Set all remaining rows to not visible
         for index in range(GUIConfig.GUIConstants['setupsPerPage'] - len(setups)):
            for cellName, labelCtrl in listingTable[GUIConfig.GUIConstants['setupsPerPage'] - index].items():
                ac.setVisible(labelCtrl, 0)
+
+
+def hideSetupsListingTable():
+    for key, row in listingTable.items():
+        for cellName, labelCtrl in row.items():
+            ac.setVisible(labelCtrl, 0)
 
 
 def updatePageSpinner(pageCount, currentValue):
@@ -453,7 +457,14 @@ def onDownloadButton5Clicked(*args):
 @async
 def onRefreshSetupsButtonClick(*args):
     global setups
-    setups = tsm.getSetups(currentCarName, currentTrackFullName)
+
+    # Hide setups listing table
+    hideSetupsListingTable()
+    ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+    ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Loading...')
+
+    # Get setups from api.
+    setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
     # If there is setups for the default type, update the table.
     if len(setups[activeSetupType]) > 0:
@@ -462,6 +473,7 @@ def onRefreshSetupsButtonClick(*args):
         if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
             # ac.log(str(setupType)+' setups pages: '+str(len(setupList) / GUIConfig.GUIConstants['setupsPerPage']))
 
+            updateSetupsListingTable(setups[activeSetupType][:5])
             updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
         else:
             # ac.log('One page only')
