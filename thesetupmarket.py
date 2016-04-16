@@ -137,19 +137,7 @@ def acMain(ac_version):
     # Get setups for current car and track.
     setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
-    # If there is setups for the default type, update the table.
-    if len(setups[activeSetupType]) > 0:
-
-        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
-        if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
-            updateSetupsListingTable(setups[activeSetupType][:5])
-            updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
-        else:
-            updateSetupsListingTable(setups[activeSetupType])
-
-    # if there is no setups for this type, show empty table label.
-    else:
-        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+    refreshSetupsListingTable()
 
     return "The Setup Market"
 
@@ -336,6 +324,23 @@ def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
     ac.setFontAlignment(cell, textAlign)
 
 
+def refreshSetupsListingTable():
+    # If there is setups for the default type, update the table.
+    if len(setups[activeSetupType]) > 0:
+        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
+        if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
+            updateSetupsListingTable(setups[activeSetupType][:5])
+            updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+        else:
+            updateSetupsListingTable(setups[activeSetupType])
+
+    # if there is no setups for this type, show empty table label.
+    else:
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        hideSetupsListingTable()
+        #updateSetupsListingTable(setups[activeSetupType][:5])
+
+
 def updateSetupsListingTable(setups):
     global eventInfos
 
@@ -419,6 +424,12 @@ def hideSetupsListingTable():
             ac.setVisible(labelCtrl, 0)
 
 
+def showSetupsListingTable():
+    for key, row in listingTable.items():
+        for cellName, labelCtrl in row.items():
+            ac.setVisible(labelCtrl, 1)
+
+
 def updatePageSpinner(pageCount, currentValue):
     global listingTablePageSpinner
 
@@ -464,31 +475,61 @@ def onListingTableSetupTypeButtonClick(*args):
 def onDownloadButton1Clicked(*args):
     ac.log('TheSetupMarket logs | dl button1 clicked')
     if eventInfos['setupIds'][0] != '':
-        tsm.downloadSetup(eventInfos['setupIds'][0], eventInfos['setupFilenames'][0], currentCarName, currentTrackBaseName, currentTrackLayout)
+        hideSetupsListingTable()
+
+        # Show the Downloading message
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
+
+        tsm.downloadSetup(eventInfos['setupIds'][0], eventInfos['setupFilenames'][0], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
 def onDownloadButton2Clicked(*args):
     ac.log('TheSetupMarket logs | dl button2 clicked')
     if eventInfos['setupIds'][1] != '':
-        tsm.downloadSetup(eventInfos['setupIds'][1], eventInfos['setupFilenames'][1], currentCarName, currentTrackBaseName, currentTrackLayout)
+        hideSetupsListingTable()
+
+        # Show the Downloading message
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
+
+        tsm.downloadSetup(eventInfos['setupIds'][1], eventInfos['setupFilenames'][1], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
 def onDownloadButton3Clicked(*args):
     ac.log('TheSetupMarket logs | dl button3 clicked')
     if eventInfos['setupIds'][2] != '':
-        tsm.downloadSetup(eventInfos['setupIds'][2], eventInfos['setupFilenames'][2], currentCarName, currentTrackBaseName, currentTrackLayout)
+        hideSetupsListingTable()
+
+        # Show the Downloading message
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
+
+        tsm.downloadSetup(eventInfos['setupIds'][2], eventInfos['setupFilenames'][2], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
 def onDownloadButton4Clicked(*args):
     ac.log('TheSetupMarket logs | dl button4 clicked')
     if eventInfos['setupIds'][3] != '':
-        tsm.downloadSetup(eventInfos['setupIds'][3], eventInfos['setupFilenames'][3], currentCarName, currentTrackBaseName, currentTrackLayout)
+        hideSetupsListingTable()
+
+        # Show the Downloading message
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
+
+        tsm.downloadSetup(eventInfos['setupIds'][3], eventInfos['setupFilenames'][3], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
 def onDownloadButton5Clicked(*args):
     ac.log('TheSetupMarket logs | dl button5 clicked')
     if eventInfos['setupIds'][4] != '':
-        tsm.downloadSetup(eventInfos['setupIds'][4], eventInfos['setupFilenames'][4], currentCarName, currentTrackBaseName, currentTrackLayout)
+        hideSetupsListingTable()
+
+        # Show the Downloading message
+        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
+        
+        tsm.downloadSetup(eventInfos['setupIds'][4], eventInfos['setupFilenames'][4], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
 @async
@@ -505,16 +546,4 @@ def onRefreshSetupsButtonClick(*args):
     # Get setups from api.
     setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
-    # If there is setups for the default type, update the table.
-    if len(setups[activeSetupType]) > 0:
-        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
-        if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
-            updateSetupsListingTable(setups[activeSetupType][:5])
-            updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
-        else:
-            updateSetupsListingTable(setups[activeSetupType])
-
-    # if there is no setups for this type, show empty table label.
-    else:
-        ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
-        updateSetupsListingTable(setups[activeSetupType][:5])
+    refreshSetupsListingTable()

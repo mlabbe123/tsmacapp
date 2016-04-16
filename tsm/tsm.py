@@ -78,7 +78,7 @@ def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
 
 
 @async
-def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_layout):
+def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_layout, refreshSetupsListingTable):
     url = "http://thesetupmarket.com/setup_files/55c2cddddebcbba924bb2a34/" + setup_id + "/"
 
     path_to_save = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + setup_file_name
@@ -100,6 +100,8 @@ def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_
 
     else:
         ac.log('TheSetupMarket logs | setupid: ' + setup_id + 'error while downloading')
+
+    refreshSetupsListingTable()
 
 
 # Thank you rivali tempo devs...
