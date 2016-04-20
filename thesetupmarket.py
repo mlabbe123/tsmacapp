@@ -528,7 +528,7 @@ def onDownloadButton5Clicked(*args):
         # Show the Downloading message
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
         ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
-        
+
         tsm.downloadSetup(eventInfos['setupIds'][4], eventInfos['setupFilenames'][4], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
 
 
