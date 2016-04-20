@@ -1,11 +1,18 @@
 import ac
-import os
 import traceback
-import ctypes.wintypes
+
+try:
+    import ctypes.wintypes
+except:
+    ac.log('TheSetupMarket logs | error loading ctypes.wintypes: ' + traceback.format_exc())
+    raise
+
 from ctypes.wintypes import MAX_PATH
+
+# TODO: read from config file for filters | IMPORTS
 from os.path import dirname, realpath
 #import configparser
-from operator import itemgetter, attrgetter, methodcaller
+
 import functools
 import threading
 
@@ -20,11 +27,14 @@ def async(func):
     return wrapper
 
 
-try: 
-    import requests
+try:
+    from tsm_libraries import requests
 except Exception as e:
-    ac.log('TheSetupMarket logs | error loading requests: '+traceback.format_exc())
+    ac.log('TheSetupMarket logs | error loading requests: ' + traceback.format_exc())
+    raise
 
+
+# TODO: read from config file for filters
 #config_path = dirname(realpath(__file__))
 
 #config_ini_file = config_path + '/../config/config.ini'
@@ -38,9 +48,6 @@ except Exception as e:
 # Functions for setups download section
 #######################################
 def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
-    ac.log('TheSetupMarket logs | car_code: '+car_code)
-    ac.log('TheSetupMarket logs | track_code: '+currentTrackBaseName + '-' + currentTrackLayout)
-
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
         setups = resp.json()
@@ -51,12 +58,7 @@ def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
     anyTracksSetups = []
     otherTrackSetups = []
 
-    # Get current track full name, matching the DB ac_code.
-    # if ac.getTrackConfiguration(0) != '':
-    #     currentTrackFullName = currentTrackBaseName + '-' + currentTrackLayout
-    # else:
-    #     currentTrackFullName = currentTrackBaseName
-
+    # TODO: sort and filter setups with config file
     #ac.log(str(setups.sort(key=extract_sim_version)))
 
     for setup in setups:
@@ -69,10 +71,6 @@ def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
             elif not currentTrackBaseName in setup['track']['ac_code'] and setup['track']['_id'] != '55db6db13cc3a26dcae7116d':
                 otherTrackSetups.append(setup)
 
-    ac.log('TheSetupMarket logs | trackSpecificSetups count: ' + str(len(trackSpecificSetups)))
-    ac.log('TheSetupMarket logs | anyTracksSetups count: ' + str(len(anyTracksSetups)))
-    ac.log('TheSetupMarket logs | otherTrackSetups count: ' + str(len(otherTrackSetups)))
-
     categorizedSetupsObj = {}
     categorizedSetupsObj['trackSpecific'] = list(reversed(trackSpecificSetups))
     categorizedSetupsObj['anyTracks'] = list(reversed(anyTracksSetups))
@@ -82,20 +80,20 @@ def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
 
 
 @async
-def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_layout):
-    ac.log('Download --> setupId: ' + str(setup_id) + ' | filename: ' + setup_file_name)
-
+def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_layout, refreshSetupsListingTable):
     url = "http://thesetupmarket.com/setup_files/55c2cddddebcbba924bb2a34/" + setup_id + "/"
 
-    # Thank you rivali tempo devs...
     path_to_save = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + setup_file_name
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except:
+        ac.console('TheSetupMarket logs | failed at r = requests.get(url)')
+        r = {}
+        r['status_code'] = ''
 
     if r.status_code == 200:
-        ac.console('TheSetupMarket logs | setupid: ' + setup_id + ' downloaded')
         try:
-            ac.log('TheSetupMarket logs | trying path_to_save: ' + path_to_save)
             with open(path_to_save, 'wb') as fd:
                 for chunk in r.iter_content(chunk_size=1):
                     fd.write(chunk)
@@ -105,15 +103,7 @@ def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_
     else:
         ac.log('TheSetupMarket logs | setupid: ' + setup_id + 'error while downloading')
 
-
-def filterSetups(setupList, predicateName, predicateValue):
-    filteredSetupList = []
-
-    for setup in setupList:
-        if setup[predicateName] == predicateValue:
-            filteredSetupList.append(setup)
-
-    return filteredSetupList
+    refreshSetupsListingTable()
 
 
 #######################################
@@ -131,13 +121,19 @@ def getAllSetupsFromFolder(car_ac_code, track_baseName):
     # Build a new list without all files downloaded by the app (files starting with TSM)
     allSetupFilesNotTSM = []
 
-    for setupFile in allSetupFiles:
-        if 'TSM-ac' not in setupFile:
-            allSetupFilesNotTSM.append(setupFile)
-
     ac.log('TheSetupMarket logs | all setups in folder not TSM: ' + str(allSetupFilesNotTSM))
 
     return allSetupFilesNotTSM
+
+
+# def filterSetups(setupList, predicateName, predicateValue):
+#     filteredSetupList = []
+#
+#     for setup in setupList:
+#         if setup[predicateName] == predicateValue:
+#             filteredSetupList.append(setup)
+#
+#     return filteredSetupList
 
 
 def uploadSetup(filename, trim, baseline, car_ac_code, track_baseName, track_layout):
@@ -204,11 +200,11 @@ def get_personal_folder():
         raise Exception('TheSetupMarket logs | Could not find "Documents" folder')
 
 
-def extract_sim_version(setup):
-    try:
-        return setup['sim_version']
-    except KeyError:
-        return 0
+# def extract_sim_version(setup):
+#     try:
+#         return setup['sim_version']
+#     except KeyError:
+#         return 0
 
 def get_ac_version_from_api():
     url = 'http://thesetupmarket.com/api/get-sim-infos/Assetto%20Corsa'
