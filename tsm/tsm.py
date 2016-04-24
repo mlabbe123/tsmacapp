@@ -1,5 +1,6 @@
 import ac
 import traceback
+import os
 
 try:
     import ctypes.wintypes
@@ -16,6 +17,7 @@ from os.path import dirname, realpath
 import functools
 import threading
 
+from tsm.steam_utils.steam_info import get_steam_username, get_steam_id
 
 def async(func):
     @functools.wraps(func)
@@ -121,6 +123,10 @@ def getAllSetupsFromFolder(car_ac_code, track_baseName):
     # Build a new list without all files downloaded by the app (files starting with TSM)
     allSetupFilesNotTSM = []
 
+    for setupFile in allSetupFiles:
+        if 'TSM-ac' not in setupFile:
+            allSetupFilesNotTSM.append(setupFile)
+
     ac.log('TheSetupMarket logs | all setups in folder not TSM: ' + str(allSetupFilesNotTSM))
 
     return allSetupFilesNotTSM
@@ -135,15 +141,14 @@ def getAllSetupsFromFolder(car_ac_code, track_baseName):
 #
 #     return filteredSetupList
 
-
-def uploadSetup(filename, trim, baseline, car_ac_code, track_baseName, track_layout):
+def uploadSetup(ac_version, user_steamId, filename, trim, baseline, car_id, track_id, car_ac_code, track_baseName, track_layout):
 
     if track_layout != '':
         track_ac_code = track_baseName + '-' + track_layout
     else:
         track_ac_code = track_baseName
 
-    ac.log('TheSetupMarket logs | uploadSetup params: ' + str(filename) + ', ' + str(trim) + ', ' +  str(baseline) + ', ' + str(car_ac_code) + ', ' + str(track_ac_code))
+    ac.log('TheSetupMarket logs | uploadSetup params: ' + str(filename) + ', ' + str(trim) + ', ' +  str(baseline) + ', ' + str(car_id) + ', ' + str(track_id))
 
     filepath = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + filename
     ac.log('TheSetupMarket logs | uploadSetup filepath: ' + str(filepath))
@@ -152,40 +157,28 @@ def uploadSetup(filename, trim, baseline, car_ac_code, track_baseName, track_lay
     url = 'http://thesetupmarket.com/api/create-setup/'
     file = {'file': open(filepath, 'rb')}
     sim_id = '55c2cddddebcbba924bb2a34'
-    # TODO: Find a way to find current sim version
-    sim_version = '1.5'
-    # TODO: Find the user steamID, then map it to a user_id
-    user_id = '55c2cba1a39491a1247e72df'
-    # TODO: Get the car_id from the car_ac_code
-    car_id = '5617c467314a9b764c43d3c9' # This is the car_id for the R8 LMS Ultra
-    # TODO: Get the track_id from the track_ac_code
+
+     # Get the user TSM Id
+    userTSMId = getUserTSMIdWithSteamID(user_steamId)
+    ac.log('TheSetupMarket logs | uploadSetup userTSMId: ' + str(userTSMId))
+
     if baseline:
         track_id = '55db6db13cc3a26dcae7116d'
     else:
-        track_id = '55c370982fd0d7166d97cf99' # This is the track_id for Nordschleife Endurance
+        track_id = track_id # This is the track_id for Nordschleife Endurance
+
     trim = trim.lower()
 
-    r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': sim_version, 'user_id': user_id, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
+    r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': ac_version, 'user_id': userTSMId, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | upload request success! Status code: ' + str(r.status_code))
+        return True
     else:
         ac.log('TheSetupMarket logs | upload request failed! Status code: ' + str(r.status_code))
         ac.log('TheSetupMarket logs | upload request failed! text: ' + str(r.text))
         ac.log('TheSetupMarket logs | upload request failed! content: ' + str(r.content))
-
-    # API is expecting:
-    # -------
-    # fd.append('file', setup.file);
-    # fd.append('file_name', setup.file.name);
-    # fd.append('sim_id', setup.sim.id)
-    # fd.append('sim_version', setup.sim.versions[setup.sim.versions.length - 1]);
-    # fd.append('user_id', setup.author_userid);
-    # fd.append('car_id', setup.car._id);
-    # fd.append('track_id', setup.track._id);
-    # fd.append('trim', setup.trim);
-    # fd.append('best_laptime', setup.best_laptime || '');
-    # fd.append('comments', setup.comments || '');
+        return False
 
 
 #######################################
@@ -263,36 +256,47 @@ def get_trackid_from_api(ac_code):
     return trackId
 
 
-def getUserSteamCommunityIDFromLog():
-    logFilePath = get_personal_folder() + r'\Assetto Corsa\logs\log.txt'
+def getUserTSMIdWithSteamID(steamID):
+    url = 'http://thesetupmarket.com/api/get-user-by-steamId/' + str(steamID)
 
-    userSteamCommunityID = False
+    r = requests.get(url)
 
-    with open(logFilePath) as infile:
-        for line in infile:
-            if 'Steam Community ID' in line:
-                userSteamCommunityID = str(line).replace('Steam Community ID: ', '')
+    if r.status_code == 200:
+        try:
+            request_json = r.json()
+            userTSMId = request_json['_id']
+        except:
+            ac.log('TheSetupMarket logs | getUserTSMIdWithSteamID failed at request_json = r.json() = ')
+            userTSMId = False
+    else:
+        ac.log('TheSetupMarket logs | getUserTSMIdWithSteamID failed. status_code = ' + str(r.status_code))
+        userTSMId = False
 
-    return userSteamCommunityID
+    return userTSMId
 
 
-def checkIfUserExistsOnTSM(userSteamCommunityID):
-    ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM top')
+def checkIfUserExistsOnTSM(userSteamID):
+    ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM userSteamID = ' + str(userSteamID))
     userExists = False
 
-    url = 'http://thesetupmarket.com/api/get-user-by-sci/' + userSteamCommunityID
-
+    url = 'http://thesetupmarket.com/api/get-user-by-sci/' + str(userSteamID)
     r = requests.get(url)
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM status = 200')
         try:
-            ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM try request_json = r.json()' + str(r))
             request_json = r.json()
 
-            if len(request_json) == 1:
-                userExists = True
+            userExists = True
         except:
             ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM failed at request_json = r.json()')
 
     return userExists
+
+
+def getUserSteamId():
+    return get_steam_id()
+
+
+def getUserSteamUsername():
+    return get_steam_username()

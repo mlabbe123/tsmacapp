@@ -10,10 +10,10 @@ else:
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "tsm", sysdir))
 os.environ['PATH'] = os.environ['PATH'] + ";."
 
-
 import ac
 import traceback
 import math
+import time
 import functools
 import threading
 from collections import OrderedDict
@@ -160,7 +160,7 @@ def acMain(ac_version):
 
 
 def initUploadSection():
-    global userSteamCommunityID, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId
+    global userSteamId, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId
 
     ##########################
     # Set the static variables
@@ -178,16 +178,17 @@ def initUploadSection():
     # Set the dynamic variables
     ##########################
 
-    # Get the user steam community ID
-    userSteamCommunityID = tsm.getUserSteamCommunityIDFromLog()
+    # Get the user steamID
+    userSteamId = tsm.getUserSteamId()
+    ac.log('TheSetupMarket logs | userSteamId = ' + str(userSteamId))
 
     # Check TSM database to see if user exists
-    userExists = tsm.checkIfUserExistsOnTSM(userSteamCommunityID)
+    userExists = tsm.checkIfUserExistsOnTSM(userSteamId)
+    ac.log('TheSetupMarket logs | userExists = ' + str(userExists))
 
     # Get the active AC version
     current_ac_version = tsm.get_ac_version_from_api()
-
-    # Get the user steamID
+    ac.log('TheSetupMarket logs | current_ac_version = ' + str(current_ac_version))
 
     # Get the carID for the currentCarName
     current_carId = tsm.get_carid_from_api(currentCarName)
@@ -207,7 +208,7 @@ def initUploadSection():
         currentUploadFileName = 'No file in track folder'
 
     # Check if we have errors that would break the upload function. If so, disable uploading.
-    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamCommunityID or not userExists:
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
         ac.log('TheSetupMarket logs | disabling uploading...')
         uploadAvailability = False
 
@@ -494,6 +495,7 @@ def hideUploadGUI():
 
 
 def showUploadGUI():
+    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
     ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 1)
     ac.setVisible(uploadSectionElements['fileSelectorButton'], 1)
     ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 1)
@@ -501,6 +503,17 @@ def showUploadGUI():
     ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 1)
     ac.setVisible(uploadSectionElements['baselineSelectorButton'], 1)
     ac.setVisible(uploadSectionElements['uploadButton'], 1)
+
+
+def showUploadingMessage():
+    ac.setText(uploadSectionElements['uploadMessageLabel'], 'Downloading...')
+    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
+
+
+def showUploadedMessage(msg):
+    ac.setText(uploadSectionElements['uploadMessageLabel'], msg)
+    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
+    time.sleep(3)
 
 
 def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
@@ -774,10 +787,22 @@ def onTrimSelectorButtonClick(*args):
     ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
 
 
+@async
 def onUploadButtonClick(*args):
     ac.log('onUploadButtonClick')
+    # Hide upload section GUI
+    hideUploadGUI()
+    showUploadingMessage()
+    
+    isUploaded = tsm.uploadSetup(current_ac_version, userSteamId, currentUploadFileName, currentUploadTrim, currentUploadBaseline, current_carId, current_trackId, currentCarName, currentTrackBaseName, currentTrackLayout)
 
-    tsm.uploadSetup(currentUploadFileName, currentUploadTrim, currentUploadBaseline, currentCarName, currentTrackBaseName, currentTrackLayout)
+    if isUploaded:
+        # Show Uploaded message
+        showUploadedMessage('The setup has been uploaded successfully.')
+    else:
+        showUploadedMessage('There has been an error uploading the setup.')
+
+    showUploadGUI()
 
 
 def onBaselineSelectorButtonClick(*args):
@@ -812,7 +837,7 @@ def onRefreshUploadSectionButtonClick(*args):
     ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
 
     # Check if we have errors that would break the upload function. If so, disable uploading.
-    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamCommunityID or not userExists:
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
         ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: disabling uploading...')
         uploadAvailability = False
 
