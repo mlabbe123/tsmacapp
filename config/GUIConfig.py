@@ -43,5 +43,25 @@ GUIConstants = {
             'version_cell': 60
         },
         'startingYPosition': 75
+    },
+    'updateTableLayout': {
+        'cellHeight': 21,
+        'xPos': {
+            'select_cell': 5,
+            'file_name_cell': 55,
+            'track_cell': 200,
+            'trim_cell': 450,
+            'acversion_cell': 500,
+            'version_cell': 530
+        },
+        'cellXSize': {
+            'select_cell': 50,
+            'file_name_cell': 150,
+            'track_cell': 250,
+            'trim_cell': 50,
+            'acversion_cell': 30,
+            'version_cell': 60
+        },
+        'startingYPosition': 277
     }
 }

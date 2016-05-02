@@ -27,6 +27,12 @@ except Exception as e:
     importError = True
 
 try:
+	from tsm import GUIhelpers
+except Exception as e:
+    ac.log('TheSetupMarket logs | error loading tsm GUIhelpers module: ' + traceback.format_exc())
+    importError = True
+
+try:
     from config import GUIConfig
 except Exception as e:
     ac.log('TheSetupMarket logs | error loading GUIConfig module: ' + traceback.format_exc())
@@ -44,10 +50,10 @@ def async(func):
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, listingTableMisc, activeSetupType, uploadSectionElements, currentUploadTrim, currentUploadBaseline
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, updateListingTable, listingTableMisc, listingUpdateTableMisc, activeSetupType, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, currentUploadType, userSetupListingTable
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 800, 320)
+    ac.setSize(appWindow, 800, 450)
 
     if importError:
         initAppWithImportError()
@@ -124,9 +130,16 @@ def acMain(ac_version):
         })
     ])
 
-    # Set the GUI elements for the upload section
-    # TODO: Set these elements on load, hidden. Create a function refreshUploadSection that shows/hides elements and change text for the errorMessageLabel and the fileSelectorButton. Create a helper function to show/hide an element.
+    # Set the GUI elements for the general upload section
+    uploadSectionGeneralElements = {
+        'uploadTypeSwitcherButton': ac.addLabel(appWindow, ''),
+        'updateTypeSwitcherButton': ac.addLabel(appWindow, ''),
+        'deleteTypeSwitcherButton': ac.addLabel(appWindow, '')
+    }
+
+    # Set the GUI elements for the upload NEW setup section
     uploadSectionElements = {
+        'refreshUploadGUIButton': ac.addButton(appWindow, ''),
         'fileSelectorButtonLabel': ac.addLabel(appWindow, ''),
         'fileSelectorButton': ac.addButton(appWindow, ''),
         'trimSelectorButtonLabel': ac.addLabel(appWindow, ''),
@@ -134,9 +147,84 @@ def acMain(ac_version):
         'baselineSelectorButtonLabel': ac.addLabel(appWindow, ''),
         'baselineSelectorButton': ac.addButton(appWindow, ''),
         'uploadButton': ac.addButton(appWindow, ''),
-        'uploadMessageLabel': ac.addLabel(appWindow, ''),
-        'refreshUploadGUIButton': ac.addButton(appWindow, '')
+        'uploadMessageLabel': ac.addLabel(appWindow, '')
     }
+
+    # Set the GUI elements for the upload UPDATE existing setup section
+    updateSectionElements = {
+        'refreshUpdateGUIButton': ac.addButton(appWindow, ''),
+        'listingTableFilenameHeader': ac.addLabel(appWindow, ''),
+        'listingTableTrackHeader': ac.addLabel(appWindow, ''),
+        'listingTableTrimHeader': ac.addLabel(appWindow, ''),
+        'listingTableAcVersionHeader': ac.addLabel(appWindow, ''),
+        'listingTableSetupVersionHeader': ac.addLabel(appWindow, ''),
+        'fileSelectorButton': ac.addButton(appWindow, ''),
+        'trimSelectorRaceButton': ac.addButton(appWindow, ''),
+        'trimSelectorQualyButton': ac.addButton(appWindow, ''),
+        'trimSelectorBaseButton': ac.addButton(appWindow, ''),
+        'baselineSelectorButton': ac.addButton(appWindow, ''),
+        'uploadButton': ac.addButton(appWindow, ''),
+        'uploadMessageLabel': ac.addLabel(appWindow, ''),
+        'updateMessageLabel': ac.addLabel(appWindow, 'This is the update section'),
+        'updateOptionsMessageLabel': ac.addLabel(appWindow, 'Select a setup on the left.')
+    }
+
+    # Initialize the listing tables.
+    updateListingTable = OrderedDict([
+        (1, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (2, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (3, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (4, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (5, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        })
+    ])
+
+    listingUpdateTableMisc = {
+        'emptyRowLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'No setups for current car and track'
+        },
+        'loadingLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Loading...'
+        }
+    }
+
+    currentUploadType = 'new'
 
     # Get current car/track/layout.
     currentCarName = ac.getCarName(0)
@@ -160,7 +248,7 @@ def acMain(ac_version):
 
 
 def initUploadSection():
-    global userSteamId, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId
+    global userSteamId, userTSMId, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUpdateFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId, userTSMSetups
 
     ##########################
     # Set the static variables
@@ -182,6 +270,10 @@ def initUploadSection():
     userSteamId = tsm.getUserSteamId()
     ac.log('TheSetupMarket logs | userSteamId = ' + str(userSteamId))
 
+    # Get the user TSM id
+    userTSMId = tsm.getUserTSMIdWithSteamID(userSteamId)
+    ac.log('TheSetupMarket logs | userTSMId = ' + str(userTSMId))
+
     # Check TSM database to see if user exists
     userExists = tsm.checkIfUserExistsOnTSM(userSteamId)
     ac.log('TheSetupMarket logs | userExists = ' + str(userExists))
@@ -198,14 +290,19 @@ def initUploadSection():
     current_trackId = tsm.get_trackid_from_api(track_ac_code)
     ac.log('TheSetupMarket logs | current_trackId = ' + str(current_trackId))
 
+    # Get all users uploaded setups
+    userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
+
     # Get all the files names in the current track folder
     allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
 
     # Set the current upload filename
     if len(allSetupsFileNamesInFolder) > 0:
         currentUploadFileName = allSetupsFileNamesInFolder[0]
+        currentUpdateFileName = allSetupsFileNamesInFolder[0]
     else:
         currentUploadFileName = 'No file in track folder'
+        currentUpdateFileName = 'No file in track folder'
 
     # Check if we have errors that would break the upload function. If so, disable uploading.
     if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
@@ -270,15 +367,14 @@ def initGUI(appWindow):
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
-    addTableCell(appWindow, '', 25, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 10, 53, 'center')
-    addTableCell(appWindow, 'Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 53, 'center')
-    addTableCell(appWindow, 'Author', 175, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'],285, 53, 'center')
-    addTableCell(appWindow, 'Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 460, 53, 'center')
-    addTableCell(appWindow, 'Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 510, 53, 'center')
-    addTableCell(appWindow, 'Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 590, 53, 'center')
-    addTableCell(appWindow, 'Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 660, 53, 'center')
-    addTableCell(appWindow, 'AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 700, 53, 'center')
-    addTableCell(appWindow, 'Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 730, 53, 'center')
+    addTableCell('Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 35, 53, 'center', False)
+    addTableCell('Author', 175, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'],285, 53, 'center', False)
+    addTableCell('Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 460, 53, 'center', False)
+    addTableCell('Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 510, 53, 'center', False)
+    addTableCell('Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 590, 53, 'center', False)
+    addTableCell('Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 660, 53, 'center', False)
+    addTableCell('AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 700, 53, 'center', False)
+    addTableCell('Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 730, 53, 'center', False)
 
     # Init the setups listing table with empty labels
     yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
@@ -324,19 +420,9 @@ def initGUI(appWindow):
         ac.setVisible(labelCtrl, 0)
         ac.setFontAlignment(labelCtrl, 'center')
 
-    # SEPARATOR BEFORE SPINNERS
-    separator1 = ac.addLabel(appWindow, '')
-    ac.setSize(separator1, 780, 1)
-    ac.setBackgroundColor(separator1, 1, 1, 1)
-    ac.setBackgroundOpacity(separator1, 1)
-    ac.drawBackground(separator1, 1)
-    ac.drawBorder(separator1, 0)
-    ac.setVisible(separator1, 1)
-    ac.setPosition(separator1, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 114)
-
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
-    ac.setPosition(listingTableSetupTypeButton, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 120)
+    ac.setPosition(listingTableSetupTypeButton, 10, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 115)
     ac.setSize(listingTableSetupTypeButton, 140, 22)
     ac.setText(listingTableSetupTypeButton, 'Current Track')
     ac.setBackgroundColor(listingTableSetupTypeButton, 1, 1, 1)
@@ -360,14 +446,14 @@ def initGUI(appWindow):
     ac.drawBackground(separator, 1)
     ac.drawBorder(separator, 0)
     ac.setVisible(separator, 1)
-    ac.setPosition(separator, 0, 228)
+    ac.setPosition(separator, 0, 218)
 
     # Add upload section title
-    section4Title = ac.addLabel(appWindow, "/Upload setup")
-    ac.setPosition(section4Title, 10, 235)
+    # section4Title = ac.addLabel(appWindow, "/Upload setup")
+    # ac.setPosition(section4Title, 10, 235)
 
     # Add reset upload section button
-    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 720, 235)
+    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 720, 226)
     ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
     ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
     ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
@@ -383,6 +469,49 @@ def initUploadSectionGUI():
 
     ac.log('TheSetupMarket logs | initUploadSectionGUI: Init the upload section GUI')
 
+    # Configure the button to switch to Upload
+    ac.setPosition(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 300, 226)
+    ac.setSize(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 60, 22)
+    ac.setText(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'Upload')
+    ac.setBackgroundColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.drawBackground(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.drawBorder(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
+    ac.addOnClickedListener(uploadSectionGeneralElements['uploadTypeSwitcherButton'], onUploadTypeSwitcherButtonClick)
+    ac.setFontAlignment(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'center')
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+
+    # Configure the button to switch to Update
+    ac.setPosition(uploadSectionGeneralElements['updateTypeSwitcherButton'], 360, 226)
+    ac.setSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], 60, 22)
+    ac.setText(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'Update')
+    ac.setBackgroundColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
+    ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    ac.drawBackground(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    ac.drawBorder(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    ac.addOnClickedListener(uploadSectionGeneralElements['updateTypeSwitcherButton'], onUpdateTypeSwitcherButtonClick)
+    ac.setFontAlignment(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'center')
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+
+    # Configure the button to switch to Delete
+    ac.setPosition(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 420, 226)
+    ac.setSize(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 60, 22)
+    ac.setText(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 'Delete')
+    ac.setBackgroundColor(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 0, 0, 0)
+    ac.setFontColor(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 1)
+    ac.drawBackground(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 1)
+    ac.drawBorder(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 0)
+    ac.addOnClickedListener(uploadSectionGeneralElements['deleteTypeSwitcherButton'], onUpdateTypeSwitcherButtonClick)
+    ac.setFontAlignment(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 'center')
+    ac.setVisible(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 1)
+
+    ###################################
+    ### Upload new section          ###
+    ###################################
+
     # Configure the error message label
     ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 275)
     ac.setSize(uploadSectionElements['uploadMessageLabel'], 800, 22)
@@ -390,26 +519,26 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
 
     # Configure the file selector label
-    ac.setPosition(uploadSectionElements['fileSelectorButtonLabel'], 10, 260)
+    ac.setPosition(uploadSectionElements['fileSelectorButtonLabel'], 10, 290)
     ac.setSize(uploadSectionElements['fileSelectorButtonLabel'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButtonLabel'], 'Select a file to upload (click to cycle files)')
     ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
 
     # Configure the file selector button
-    ac.setPosition(uploadSectionElements['fileSelectorButton'], 10, 282)
+    ac.setPosition(uploadSectionElements['fileSelectorButton'], 10, 312)
     ac.setSize(uploadSectionElements['fileSelectorButton'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
     ac.addOnClickedListener(uploadSectionElements['fileSelectorButton'], onFileSelectorButtonClick)
     ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
 
     # Configure the setup trim selector label
-    ac.setPosition(uploadSectionElements['trimSelectorButtonLabel'], 350, 260)
+    ac.setPosition(uploadSectionElements['trimSelectorButtonLabel'], 350, 290)
     ac.setSize(uploadSectionElements['trimSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButtonLabel'], 'Select a trim:')
     ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
 
     # Configure the upload setup trim selector
-    ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 282)
+    ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 312)
     ac.setSize(uploadSectionElements['trimSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
     ac.setBackgroundColor(uploadSectionElements['trimSelectorButton'], 1, 1, 1)
@@ -421,13 +550,13 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['trimSelectorButton'], 0)
 
     # Configure the setup baseline selector label
-    ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 450, 260)
+    ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 450, 290)
     ac.setSize(uploadSectionElements['baselineSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButtonLabel'], 'Track Specific?')
     ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
 
     # Configure the baseline selector button
-    ac.setPosition(uploadSectionElements['baselineSelectorButton'], 450, 282)
+    ac.setPosition(uploadSectionElements['baselineSelectorButton'], 450, 312)
     ac.setSize(uploadSectionElements['baselineSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButton'], 'Yes')
     ac.setBackgroundColor(uploadSectionElements['baselineSelectorButton'], 1, 1, 1)
@@ -439,8 +568,8 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
 
     # Configure the upload button
-    ac.setPosition(uploadSectionElements['uploadButton'], 715, 282)
-    ac.setSize(uploadSectionElements['uploadButton'], 75, 22)
+    ac.setPosition(uploadSectionElements['uploadButton'], 720, 312)
+    ac.setSize(uploadSectionElements['uploadButton'], 70, 22)
     ac.setText(uploadSectionElements['uploadButton'], 'Upload')
     ac.setBackgroundColor(uploadSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
     ac.setFontColor(uploadSectionElements['uploadButton'], 1, 1, 1, 1)
@@ -450,13 +579,159 @@ def initUploadSectionGUI():
     ac.addOnClickedListener(uploadSectionElements['uploadButton'], onUploadButtonClick)
     ac.setVisible(uploadSectionElements['uploadButton'], 0)
 
+    ###################################
+    ### Update section              ###
+    ###################################
+
+    # Configure the update setup message label
+    ac.setPosition(updateSectionElements['updateMessageLabel'], 0, 275)
+    ac.setSize(updateSectionElements['updateMessageLabel'], 800, 22)
+    ac.setFontAlignment(updateSectionElements['updateMessageLabel'], 'center')
+    ac.setVisible(updateSectionElements['updateMessageLabel'], 0)
+
+    # Set the listing table header
+    addTableCell('File name', 145, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 55, 255, 'center', updateSectionElements['listingTableFilenameHeader'])
+    addTableCell('Track', GUIConfig.GUIConstants['tableLayout']['cellXSize']['track_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 200, 255, 'center', updateSectionElements['listingTableTrackHeader'])
+    addTableCell('Trim', GUIConfig.GUIConstants['tableLayout']['cellXSize']['trim_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 450, 255, 'center', updateSectionElements['listingTableTrimHeader'])
+    addTableCell('AC', GUIConfig.GUIConstants['tableLayout']['cellXSize']['acversion_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 255, 'center', updateSectionElements['listingTableAcVersionHeader'])
+    addTableCell('Version', GUIConfig.GUIConstants['tableLayout']['cellXSize']['version_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 255, 'center', updateSectionElements['listingTableSetupVersionHeader'])
+
+    # Set the refresh update section button
+    ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 70, 22)
+    ac.setPosition(updateSectionElements['refreshUpdateGUIButton'], 720, 226)
+    ac.setText(updateSectionElements['refreshUpdateGUIButton'], 'Refresh')
+    ac.setBackgroundColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['refreshUpdateGUIButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['refreshUpdateGUIButton'], 1)
+    ac.drawBackground(updateSectionElements['refreshUpdateGUIButton'], 1)
+    ac.drawBorder(updateSectionElements['refreshUpdateGUIButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['refreshUpdateGUIButton'], onRefreshUpdateSectionButtonClick)
+    ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
+
+    # Set the update race trim selector button
+    ac.setPosition(updateSectionElements['trimSelectorRaceButton'], 600, 255)
+    ac.setSize(updateSectionElements['trimSelectorRaceButton'], 60, 22)
+    ac.setText(updateSectionElements['trimSelectorRaceButton'], 'Race')
+    ac.setBackgroundColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 1)
+    ac.drawBackground(updateSectionElements['trimSelectorRaceButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorRaceButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['trimSelectorRaceButton'], onUpdateTrimSelectorRaceButtonClick)
+    ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 0)
+
+    # Set the update qualy trim selector button
+    ac.setPosition(updateSectionElements['trimSelectorQualyButton'], 660, 255)
+    ac.setSize(updateSectionElements['trimSelectorQualyButton'], 60, 22)
+    ac.setText(updateSectionElements['trimSelectorQualyButton'], 'Qualy')
+    ac.setBackgroundColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 1)
+    ac.drawBackground(updateSectionElements['trimSelectorQualyButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorQualyButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['trimSelectorQualyButton'], onUpdateTrimSelectorQualyButtonClick)
+    ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 0)
+
+    # Set the update base trim selector button
+    ac.setPosition(updateSectionElements['trimSelectorBaseButton'], 720, 255)
+    ac.setSize(updateSectionElements['trimSelectorBaseButton'], 60, 22)
+    ac.setText(updateSectionElements['trimSelectorBaseButton'], 'Base')
+    ac.setBackgroundColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 1)
+    ac.drawBackground(updateSectionElements['trimSelectorBaseButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorBaseButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['trimSelectorBaseButton'], onUpdateTrimSelectorBaseButtonClick)
+    ac.setVisible(updateSectionElements['trimSelectorBaseButton'], 0)
+
+    # Set the update track specific button
+    ac.setPosition(updateSectionElements['baselineSelectorButton'], 600, 285)
+    ac.setSize(updateSectionElements['baselineSelectorButton'], 190, 22)
+    ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
+    ac.setBackgroundColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 1)
+    ac.drawBackground(updateSectionElements['baselineSelectorButton'], 1)
+    ac.drawBorder(updateSectionElements['baselineSelectorButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['baselineSelectorButton'], onUpdateBaselineSelectorButtonClick)
+    ac.setVisible(updateSectionElements['baselineSelectorButton'], 0)
+
+    # Set the update file selector button
+    ac.setPosition(updateSectionElements['fileSelectorButton'], 600, 315)
+    ac.setSize(updateSectionElements['fileSelectorButton'], 190, 22)
+    ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
+    ac.addOnClickedListener(updateSectionElements['fileSelectorButton'], onUpdateFileSelectorButtonClick)
+    ac.setVisible(updateSectionElements['fileSelectorButton'], 0)
+
+    # Set the update button
+    ac.setPosition(updateSectionElements['uploadButton'], 630, 345)
+    ac.setSize(updateSectionElements['uploadButton'], 130, 22)
+    ac.setText(updateSectionElements['uploadButton'], 'Update')
+    ac.setBackgroundColor(updateSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
+    ac.setFontColor(updateSectionElements['uploadButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['uploadButton'], 1)
+    ac.drawBackground(updateSectionElements['uploadButton'], 1)
+    ac.drawBorder(updateSectionElements['uploadButton'], 0)
+    ac.addOnClickedListener(updateSectionElements['uploadButton'], onUpdateUploadButtonClick)
+    ac.setVisible(updateSectionElements['uploadButton'], 0)
+
+    yPos = GUIConfig.GUIConstants['updateTableLayout']['startingYPosition']
+    rowNumber = 1
+
+    for key, cells in updateListingTable.items():
+
+        for cellId, label in cells.items():
+            ac.setPosition(label, GUIConfig.GUIConstants['updateTableLayout']['xPos'][cellId], yPos)
+            ac.setText(label, '')
+            ac.setSize(label, GUIConfig.GUIConstants['updateTableLayout']['cellXSize'][cellId],
+                       GUIConfig.GUIConstants['updateTableLayout']['cellHeight'])
+
+            if cellId == 'select_cell':
+                ac.setBackgroundColor(label, 1, 1, 1)
+                ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+            else:
+                ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])
+
+            ac.setBackgroundOpacity(label, 1)
+            ac.drawBackground(label, 1)
+            ac.drawBorder(label, 0)
+            ac.setVisible(label, 0)
+            ac.setFontAlignment(label, 'center')
+
+            if cellId == 'select_cell':
+                if rowNumber == 1:
+                    ac.addOnClickedListener(label, onSelectUserSetupUpdateButton1Clicked)
+                elif rowNumber == 2:
+                    ac.addOnClickedListener(label, onSelectUserSetupUpdateButton2Clicked)
+                elif rowNumber == 3:
+                    ac.addOnClickedListener(label, onSelectUserSetupUpdateButton3Clicked)
+                elif rowNumber == 4:
+                    ac.addOnClickedListener(label, onSelectUserSetupUpdateButton4Clicked)
+                elif rowNumber == 5:
+                    ac.addOnClickedListener(label, onSelectUserSetupUpdateButton5Clicked)
+
+        yPos += GUIConfig.GUIConstants['updateTableLayout']['cellHeight'] + 1
+        rowNumber += 1
+
+    ac.setPosition(listingUpdateTableMisc['emptyRowLabel']['label'], 10, 310)
+    ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 590, 22)
+    ac.setFontAlignment(listingUpdateTableMisc['emptyRowLabel']['label'], 'center')
+
+    ac.setPosition(updateSectionElements['updateOptionsMessageLabel'], 595, 290)
+    ac.setSize(updateSectionElements['updateOptionsMessageLabel'], 200, 22)
+    ac.setFontAlignment(updateSectionElements['updateOptionsMessageLabel'], 'center')
+
+    for key, element in updateSectionElements.items():
+        ac.setVisible(element, 0)
+
 
 def refreshUploadSection():
     if uploadAvailability:
         ac.log('TheSetupMarket logs | refreshUploadSection : if uploadAvailability:')
         ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
-        ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
-        showUploadGUI()
+        showUploadNewSection()
     else:
         ac.log('TheSetupMarket logs | refreshUploadSection : else uploadAvailability:')
         if not userExists:
@@ -480,56 +755,46 @@ def refreshUploadSection():
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'There are no files to upload in the current track setups folder for this car')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
 
-        hideUploadGUI()
+        hideUploadNewSection()
         ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
 
 
-def hideUploadGUI():
-    ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
-    ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
-    ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
-    ac.setVisible(uploadSectionElements['trimSelectorButton'], 0)
-    ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
-    ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
-    ac.setVisible(uploadSectionElements['uploadButton'], 0)
-
-
-def showUploadGUI():
-    ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
-    ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 1)
-    ac.setVisible(uploadSectionElements['fileSelectorButton'], 1)
-    ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 1)
-    ac.setVisible(uploadSectionElements['trimSelectorButton'], 1)
-    ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 1)
-    ac.setVisible(uploadSectionElements['baselineSelectorButton'], 1)
-    ac.setVisible(uploadSectionElements['uploadButton'], 1)
+def refreshUpdateSection():
+    # If there is no files in folder, show message.
+    if len(allSetupsFileNamesInFolder) == 0:
+        # SHOULD SHOW REFRESH BUTTON AND MESSAGE ONLY
+        ac.log('TheSetupMarket logs | onUpdateTypeSwitcherButtonClick: no setups in folder')
+        ac.setText(updateSectionElements['updateMessageLabel'], 'No setup files found in folder')
+        ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
+        ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 1)
+    else:
+        # If user has no setups for current car, show message.
+        if len(userTSMSetups) == 0:
+            ac.log('TheSetupMarket logs | No setups found to be updated')
+            ac.setText(listingUpdateTableMisc['emptyRowLabel']['label'], 'No setups found to be updated')
+            ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 1)
+            showUpdateSection()
+        else:
+            # Check if there are trackSpecific setups
+            if len(userTSMSetups['trackSpecific']) > 0:
+                ac.log('TheSetupMarket logs | trackSpecific setups found')
+                showUpdateSection()
+            else:
+                ac.log('TheSetupMarket logs | NO trackSpecific setups found')
+                ac.setText(listingUpdateTableMisc['emptyRowLabel']['label'], 'No setups found to be updated for this track')
+                ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 1)
+                showUpdateSection()
 
 
 def showUploadingMessage():
-    ac.setText(uploadSectionElements['uploadMessageLabel'], 'Downloading...')
+    ac.setText(uploadSectionElements['uploadMessageLabel'], 'Uploading...')
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
 
 
 def showUploadedMessage(msg):
     ac.setText(uploadSectionElements['uploadMessageLabel'], msg)
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
-    time.sleep(3)
-
-
-def addTableCell(appWindow, text, sizeX, r, g, b, posX, posY, textAlign):
-    cell = ac.addLabel(appWindow, text)
-
-    ac.setSize(cell, sizeX, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
-
-    ac.setBackgroundColor(cell, r, g, b)
-    ac.setBackgroundOpacity(cell, 1)
-    ac.drawBackground(cell, 1)
-    ac.drawBorder(cell, 0)
-    ac.setVisible(cell, 1)
-
-    ac.setPosition(cell, posX, posY)
-
-    ac.setFontAlignment(cell, textAlign)
+    time.sleep(2)
 
 
 def refreshSetupsListingTable():
@@ -626,6 +891,41 @@ def updateSetupsListingTable(setups):
                ac.setVisible(labelCtrl, 0)
 
 
+##################################
+## Show/Hide sections functions
+##################################
+def showUploadNewSection():
+    for key, element in uploadSectionElements.items():
+        # Check also if a message should be displayed (if the user have no file in the folder for exemple)
+        if key != 'uploadMessageLabel':
+            ac.setVisible(element, 1)
+
+
+def hideUploadNewSection():
+    for key, element in uploadSectionElements.items():
+        ac.setVisible(element, 0)
+
+
+def showUpdateSection():
+    for key, element in updateSectionElements.items():
+        # Check also if a message should be displayed (if the user have no uploaded setup to update for exemple)
+        if key != 'updateMessageLabel':
+            ac.setVisible(element, 1)
+
+    refreshUserSetupsListingTable()
+    hideUpdateUserSetupDetails()
+
+
+def hideUpdateSection():
+    for key, element in updateSectionElements.items():
+        ac.setVisible(element, 0)
+
+    for key, element in listingUpdateTableMisc.items():
+        ac.setVisible(element['label'], 0)
+
+    hideUserSetupsListingTable()
+
+
 def hideSetupsListingTable():
     for key, row in listingTable.items():
         for cellName, labelCtrl in row.items():
@@ -638,6 +938,78 @@ def showSetupsListingTable():
             ac.setVisible(labelCtrl, 1)
 
 
+def hideUserSetupsListingTable():
+    for key, rowDict in updateListingTable.items():
+        for key, label in rowDict.items():
+            ac.setVisible(label, 0)
+
+
+def showUserSetupsListingTable():
+    for key, rowDict in updateListingTable.items():
+        for key, label in rowDict.items():
+            ac.setVisible(label, 1)
+
+
+def showUpdateUserSetupDetails(setupDetails):
+    global currentUpdateTrim, currentUpdateBestlap, currentUpdateComments, currentUpdateFileName
+
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 0)
+
+    if setupDetails['file_name'] in allSetupsFileNamesInFolder:
+        ac.setText(updateSectionElements['fileSelectorButton'], setupDetails['file_name'])
+        currentUpdateFileName = setupDetails['file_name']
+    else:
+        ac.setText(updateSectionElements['fileSelectorButton'], allSetupsFileNamesInFolder[0])
+        currentUpdateFileName = allSetupsFileNamesInFolder[0]
+
+    ac.setVisible(updateSectionElements['fileSelectorButton'], 1)
+
+    if setupDetails['type'] == 'race':
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    elif setupDetails['type'] == 'qualy':
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    else:
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+
+    ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 1)
+    ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 1)
+    ac.setVisible(updateSectionElements['trimSelectorBaseButton'], 1)
+
+    currentUpdateTrim = setupDetails['type']
+    currentUpdateBestlap = setupDetails['best_time']
+    currentUpdateComments = setupDetails['comments']
+
+    if setupDetails['track']['_id'] == '55db6db13cc3a26dcae7116d':
+        ac.setText(updateSectionElements['baselineSelectorButton'], 'Baseline setup')
+        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 0, 0, 0)
+    else:
+        ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
+        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
+    ac.setVisible(updateSectionElements['baselineSelectorButton'], 1)
+
+    ac.setVisible(updateSectionElements['uploadButton'], 1)
+
+
+def hideUpdateUserSetupDetails():
+    ac.setVisible(updateSectionElements['fileSelectorButton'], 0)
+    ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 0)
+    ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 0)
+    ac.setVisible(updateSectionElements['trimSelectorBaseButton'], 0)
+    ac.setVisible(updateSectionElements['baselineSelectorButton'], 0)
+    ac.setVisible(updateSectionElements['uploadButton'], 0)
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Select a setup on the left.')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
+
+
+##################################
+## Refresh functions
+##################################
 def updatePageSpinner(pageCount, currentValue):
     global listingTablePageSpinner
 
@@ -651,6 +1023,84 @@ def updatePageSpinner(pageCount, currentValue):
         ac.setVisible(listingTablePageSpinner, 0)
 
 
+def refreshUserSetupsListingTable():
+    ac.log('TheSetupMarket logs | refreshUserSetupsListingTable')
+    # If there is setups for the current track, update the table.
+    if len(userTSMSetups['trackSpecific']) > 0:
+        # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
+        if len(userTSMSetups['trackSpecific']) > GUIConfig.GUIConstants['setupsPerPage']:
+            updateUserSetupsListingTable(userTSMSetups['trackSpecific'][:5])
+            # updateUserSetupsPageSpinner(math.ceil(len(userTSMSetups['trackSpecific']) / GUIConfig.GUIConstants['setupsPerPage']), 1)
+        else:
+            updateUserSetupsListingTable(userTSMSetups['trackSpecific'])
+
+    # if there is no setups for this type, show empty table label.
+
+
+def updateUserSetupsListingTable(setups):
+    global updateEventInfos
+
+    ac.log('TheSetupMarket logs | updateUserSetupsListingTable')
+
+    if len(setups) == 0:
+        ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 1)
+        ac.setText(listingUpdateTableMisc['emptyRowLabel']['label'], 'No setups for current track')
+    else:
+        ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 0)
+        ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
+
+    # Set setupIds and setupFilenames for events listeners
+    updateEventInfos = {
+        'setupIds': {},
+        'setupFilenames': {}
+    }
+
+    rowNumber = 1
+
+    for setup in setups:
+        setupId = setup['_id']
+        ac.log('TheSetupMarket logs | updateUserSetupsListingTable: setupId = ' + str(setupId))
+
+        updateEventInfos['setupIds'][rowNumber - 1] = setupId
+
+        for cellName, labelCtrl in updateListingTable[rowNumber].items():
+            ac.setVisible(labelCtrl, 1)
+
+            if cellName == 'select_cell':
+                ac.setText(labelCtrl, 'Select')
+            elif cellName == 'file_name_cell':
+                ac.setText(labelCtrl, setup['file_name'])
+            elif cellName == 'track_cell':
+                ac.setText(labelCtrl, setup['track']['name'])
+            elif cellName == 'trim_cell':
+                ac.setText(labelCtrl, setup['type'])
+            elif cellName == 'acversion_cell':
+                ac.setText(labelCtrl, str(setup['sim_version']))
+            elif cellName == 'version_cell':
+                ac.setText(labelCtrl, 'v' + str(setup['version']))
+
+        rowNumber += 1
+
+    if len(setups) < GUIConfig.GUIConstants['setupsPerPage']:
+        # Set all remaining rows to not visible
+        for index in range(GUIConfig.GUIConstants['setupsPerPage'] - len(setups)):
+           for cellName, labelCtrl in updateListingTable[GUIConfig.GUIConstants['setupsPerPage'] - index].items():
+               ac.setVisible(labelCtrl, 0)
+
+
+def refreshUpdateUserSetupsAfterUpdate(msg):
+    ac.log('TheSetupMarket logs | refreshUpdateUserSetupsAfterUpdate: msg = ' + msg)
+    ac.setText(updateSectionElements['updateMessageLabel'], msg)
+    ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
+    time.sleep(2)
+
+    unselectAllUserUpdateSetups()
+    showUpdateSection()
+
+
+##################################
+## Event listeners
+##################################
 def onListingTablePageSpinnerClick(x):
     global setups, activeSetupType
 
@@ -791,10 +1241,10 @@ def onTrimSelectorButtonClick(*args):
 def onUploadButtonClick(*args):
     ac.log('onUploadButtonClick')
     # Hide upload section GUI
-    hideUploadGUI()
+    hideUploadNewSection()
     showUploadingMessage()
-    
-    isUploaded = tsm.uploadSetup(current_ac_version, userSteamId, currentUploadFileName, currentUploadTrim, currentUploadBaseline, current_carId, current_trackId, currentCarName, currentTrackBaseName, currentTrackLayout)
+
+    isUploaded = tsm.uploadSetup(userTSMId, current_ac_version, userSteamId, currentUploadFileName, currentUploadTrim, currentUploadBaseline, current_carId, current_trackId, currentCarName, currentTrackBaseName, currentTrackLayout)
 
     if isUploaded:
         # Show Uploaded message
@@ -802,7 +1252,7 @@ def onUploadButtonClick(*args):
     else:
         showUploadedMessage('There has been an error uploading the setup.')
 
-    showUploadGUI()
+    showUploadNewSection()
 
 
 def onBaselineSelectorButtonClick(*args):
@@ -817,10 +1267,11 @@ def onBaselineSelectorButtonClick(*args):
         currentUploadBaseline = True
         ac.setText(uploadSectionElements['baselineSelectorButton'], 'No')
 
+
 def onRefreshUploadSectionButtonClick(*args):
     global allSetupsFileNamesInFolder, currentUploadFileName, currentUploadFileName, uploadAvailability
 
-    hideUploadGUI()
+    hideUploadNewSection()
     ac.setText(uploadSectionElements['uploadMessageLabel'], 'Loading...')
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
 
@@ -846,3 +1297,249 @@ def onRefreshUploadSectionButtonClick(*args):
         uploadAvailability = True
 
     refreshUploadSection()
+
+def onRefreshUpdateSectionButtonClick(*args):
+    global allSetupsFileNamesInFolder, currentUploadFileName, currentUploadFileName, uploadAvailability
+    ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick')
+
+    hideUpdateSection()
+    ac.setText(updateSectionElements['updateMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
+
+    # Get all the files names in the current track folder
+    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+    ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: allSetupsFileNamesInFolder = ' + str(
+        allSetupsFileNamesInFolder))
+
+    # Check if we have errors that would break the update function. If so, disable updating.
+    if not current_ac_version or not current_carId or not current_trackId or len(
+            allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
+        ac.log('TheSetupMarket logs | onRefreshUpdateSectionButtonClick: disabling updating...')
+        uploadAvailability = False
+
+    else:
+        ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: enabling updating...')
+        uploadAvailability = True
+
+    refreshUpdateSection()
+
+
+def onUpdateBaselineSelectorButtonClick(*args):
+    global currentUploadBaseline
+    ac.log('TheSetupMarket logs | onUpdateBaselineSelectorButtonClick')
+
+    if ac.getText(updateSectionElements['baselineSelectorButton']) == 'Track Specific':
+        ac.setText(updateSectionElements['baselineSelectorButton'], 'Any tracks')
+        currentUploadBaseline = True
+    else:
+        ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
+        currentUploadBaseline = False
+
+
+def onUpdateFileSelectorButtonClick(*args):
+    global currentUpdateFileName
+    ac.log('onUpdateFileSelectorButtonClick')
+
+    if len(allSetupsFileNamesInFolder) > 0:
+
+        currentIndex = allSetupsFileNamesInFolder.index(currentUpdateFileName)
+
+        if currentIndex + 1 < len(allSetupsFileNamesInFolder):
+            currentUpdateFileName = allSetupsFileNamesInFolder[currentIndex + 1]
+        else:
+            currentUpdateFileName = allSetupsFileNamesInFolder[0]
+
+        ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
+
+
+def onUpdateUploadButtonClick(*args):
+    ac.log('TheSetupMarket logs | onUpdateUploadButtonClick')
+    hideUpdateSection()
+    ac.setText(updateSectionElements['updateMessageLabel'], 'Uploading...')
+    ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
+
+    tsm.updateSetup(currentCarName, currentTrackBaseName, currentUpdateFileName, currentUpdateSetupId, current_carId, current_trackId, current_ac_version, currentUpdateTrim, currentUploadBaseline, currentUpdateBestlap, currentUpdateComments, refreshUpdateUserSetupsAfterUpdate)
+
+
+def onUploadTypeSwitcherButtonClick(*args):
+    global currentUploadType
+
+    ac.log('onUploadTypeSwitcherButtonClick')
+    unselectAllUserUpdateSetups()
+    hideUpdateSection()
+    currentUploadType = 'new'
+    showUploadNewSection()
+    onRefreshUploadSectionButtonClick()
+    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
+    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1)
+
+
+def onUpdateTypeSwitcherButtonClick(*args):
+    global currentUploadType, currentUpdateSetupId
+
+    ac.log('onUpdateTypeSwitcherButtonClick')
+    hideUploadNewSection()
+    currentUploadType = 'update'
+
+    refreshUpdateSection()
+
+    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0, 0, 0)
+    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1)
+
+    refreshUserSetupsListingTable()
+
+
+def onSelectUserSetupUpdateButton1Clicked(*args):
+    global currentUpdateSetupId
+
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+
+    currentUpdateSetupId = updateEventInfos['setupIds'][0]
+
+    unselectAllUserUpdateSetups()
+
+    for key, label in updateListingTable[1].items():
+        if key != 'select_cell':
+            GUIhelpers.changeElementBgColor(label, 1, 1, 1)
+            ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+
+    # Get the setup details and load the setup detail section
+    tsm.getSetupDetails(currentUpdateSetupId, showUpdateUserSetupDetails)
+
+
+def onSelectUserSetupUpdateButton2Clicked(*args):
+    global currentUpdateSetupId
+
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+
+    currentUpdateSetupId = updateEventInfos['setupIds'][1]
+
+    unselectAllUserUpdateSetups()
+
+    for key, label in updateListingTable[2].items():
+        if key != 'select_cell':
+            GUIhelpers.changeElementBgColor(label, 1, 1, 1)
+            ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+
+    # Get the setup details and load the setup detail section
+    tsm.getSetupDetails(currentUpdateSetupId, showUpdateUserSetupDetails)
+
+
+def onSelectUserSetupUpdateButton3Clicked(*args):
+    global currentUpdateSetupId
+
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+
+    currentUpdateSetupId = updateEventInfos['setupIds'][2]
+
+    unselectAllUserUpdateSetups()
+
+    for key, label in updateListingTable[3].items():
+        if key != 'select_cell':
+            GUIhelpers.changeElementBgColor(label, 1, 1, 1)
+            ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+
+    # Get the setup details and load the setup detail section
+    tsm.getSetupDetails(currentUpdateSetupId, showUpdateUserSetupDetails)
+
+
+def onSelectUserSetupUpdateButton4Clicked(*args):
+    global currentUpdateSetupId
+
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+
+    currentUpdateSetupId = updateEventInfos['setupIds'][3]
+
+    unselectAllUserUpdateSetups()
+
+    for key, label in updateListingTable[4].items():
+        if key != 'select_cell':
+            GUIhelpers.changeElementBgColor(label, 1, 1, 1)
+            ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+
+    # Get the setup details and load the setup detail section
+    tsm.getSetupDetails(currentUpdateSetupId, showUpdateUserSetupDetails)
+
+
+def onSelectUserSetupUpdateButton5Clicked(*args):
+    global currentUpdateSetupId
+
+    ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+
+    currentUpdateSetupId = updateEventInfos['setupIds'][4]
+
+    unselectAllUserUpdateSetups()
+
+    for key, label in updateListingTable[5].items():
+        if key != 'select_cell':
+            GUIhelpers.changeElementBgColor(label, 1, 1, 1)
+            ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
+
+    # Get the setup details and load the setup detail section
+    tsm.getSetupDetails(currentUpdateSetupId, showUpdateUserSetupDetails)
+
+
+def onUpdateTrimSelectorRaceButtonClick(*args):
+    global currentUpdateTrim
+    ac.log('TheSetupMarket logs | onUpdateTrimSelectorRaceButtonClick')
+
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+
+    currentUpdateTrim = 'race'
+
+
+def onUpdateTrimSelectorQualyButtonClick(*args):
+    global currentUpdateTrim
+    ac.log('TheSetupMarket logs | onUpdateTrimSelectorQualyButtonClick')
+
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+
+    currentUpdateTrim = 'qualy'
+
+
+def onUpdateTrimSelectorBaseButtonClick(*args):
+    global currentUpdateTrim
+    ac.log('TheSetupMarket logs | onUpdateTrimSelectorBaseButtonClick')
+
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+
+    currentUpdateTrim = 'base'
+
+
+##################################
+## Utilitary functions
+##################################
+def addTableCell(text, sizeX, r, g, b, posX, posY, textAlign, element):
+    if not element:
+        cell = ac.addLabel(appWindow, text)
+    else:
+        cell = element
+        ac.setText(cell, text)
+
+    ac.setSize(cell, sizeX, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
+
+    ac.setBackgroundColor(cell, r, g, b)
+    ac.setBackgroundOpacity(cell, 1)
+    ac.drawBackground(cell, 1)
+    ac.drawBorder(cell, 0)
+    ac.setVisible(cell, 1)
+
+    ac.setPosition(cell, posX, posY)
+
+    ac.setFontAlignment(cell, textAlign)
+
+
+def unselectAllUserUpdateSetups():
+    for rowNumber, row in updateListingTable.items():
+        for key, label in row.items():
+            if key != 'select_cell':
+                ac.setFontColor(label, 1, 1, 1, 1)
+                GUIhelpers.changeElementBgColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])

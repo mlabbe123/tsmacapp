@@ -141,7 +141,7 @@ def getAllSetupsFromFolder(car_ac_code, track_baseName):
 #
 #     return filteredSetupList
 
-def uploadSetup(ac_version, user_steamId, filename, trim, baseline, car_id, track_id, car_ac_code, track_baseName, track_layout):
+def uploadSetup(userTSMId, ac_version, user_steamId, filename, trim, baseline, car_id, track_id, car_ac_code, track_baseName, track_layout):
 
     if track_layout != '':
         track_ac_code = track_baseName + '-' + track_layout
@@ -158,10 +158,6 @@ def uploadSetup(ac_version, user_steamId, filename, trim, baseline, car_id, trac
     file = {'file': open(filepath, 'rb')}
     sim_id = '55c2cddddebcbba924bb2a34'
 
-     # Get the user TSM Id
-    userTSMId = getUserTSMIdWithSteamID(user_steamId)
-    ac.log('TheSetupMarket logs | uploadSetup userTSMId: ' + str(userTSMId))
-
     if baseline:
         track_id = '55db6db13cc3a26dcae7116d'
     else:
@@ -169,7 +165,8 @@ def uploadSetup(ac_version, user_steamId, filename, trim, baseline, car_id, trac
 
     trim = trim.lower()
 
-    r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': ac_version, 'user_id': userTSMId, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
+    r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': ac_version,
+                                             'user_id': userTSMId, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | upload request success! Status code: ' + str(r.status_code))
@@ -179,6 +176,75 @@ def uploadSetup(ac_version, user_steamId, filename, trim, baseline, car_id, trac
         ac.log('TheSetupMarket logs | upload request failed! text: ' + str(r.text))
         ac.log('TheSetupMarket logs | upload request failed! content: ' + str(r.content))
         return False
+
+
+def getUserSetups(userTSMId, car_id, track_id):
+    try:
+        resp = requests.get('http://thesetupmarket.com/api/get-setups-by-user/' + userTSMId)
+        setups = resp.json()
+    except Exception as e:
+        ac.log('TheSetupMarket logs | error requesting user setups from tsm api: ' + traceback.format_exc())
+
+    trackSpecificSetups = []
+    otherTrackSetups = []
+
+    for setup in setups:
+
+        if setup['car']['_id'] == car_id:
+            if setup['track']['_id'] == track_id:
+                trackSpecificSetups.append(setup)
+            else:
+                otherTrackSetups.append(setup)
+
+    categorizedSetupsObj = {}
+    categorizedSetupsObj['trackSpecific'] = list(reversed(trackSpecificSetups))
+    categorizedSetupsObj['otherTracks'] = list(reversed(otherTrackSetups))
+
+    return categorizedSetupsObj
+
+
+@async
+def getSetupDetails(setupId, callback):
+    try:
+        resp = requests.get('http://thesetupmarket.com/api/get-setup/' + setupId)
+        setupDetail = resp.json()
+    except Exception as e:
+        ac.log('TheSetupMarket logs | error requesting user setup details from tsm api: ' + traceback.format_exc())
+
+    callback(setupDetail)
+
+    return setupDetail
+
+# Setup.update({_id: request.body.setup_id}, {sim_version: request.body.sim_version, type: request.body.trim, best_time: request.body.best_laptime, comments: request.body.comments}, function(err, numAffected) {
+@async
+def updateSetup(car_ac_code, track_baseName, file_name, setup_id, car_id, track_id, sim_version, trim, baseline, best_time, comments, callback):
+    filepath = get_personal_folder() + r'\Assetto Corsa\setups' + '\\' + car_ac_code + '\\' + track_baseName + '\\' + file_name
+    ac.log('TheSetupMarket logs | updateSetup filepath: ' + str(filepath))
+
+    # params for API call
+    url = 'http://thesetupmarket.com/api/update-setup-with-file/'
+    file = {'file': open(filepath, 'rb')}
+    sim_id = '55c2cddddebcbba924bb2a34'
+
+    if baseline:
+        track_id = '55db6db13cc3a26dcae7116d'
+
+    trim = trim.lower()
+
+    r = requests.post(url, files=file,
+                      data={'sim_id': sim_id, 'setup_id': setup_id, 'file_name': file_name, 'sim_version': sim_version,
+                            'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': best_time, 'comments': comments})
+
+    if r.status_code == 200:
+        ac.log('TheSetupMarket logs | update request success! Status code: ' + str(r.status_code))
+        returnMessage = 'Setup successfully updated'
+    else:
+        ac.log('TheSetupMarket logs | update request failed! Status code: ' + str(r.status_code))
+        ac.log('TheSetupMarket logs | update request failed! text: ' + str(r.text))
+        ac.log('TheSetupMarket logs | update request failed! content: ' + str(r.content))
+        returnMessage = 'Error updating setup'
+
+    callback(returnMessage)
 
 
 #######################################
