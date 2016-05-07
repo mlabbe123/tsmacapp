@@ -21,20 +21,20 @@ GUIConstants = {
     'tableLayout': {
         'cellHeight': 21,
         'xPos': {
-            'dl_cell': 10,
-            'track_cell': 35,
-            'author_cell': 285,
+            'dl_cell': 5,
+            'track_cell': 30,
+            'author_cell': 275,
             'trim_cell': 460,
             'bestlap_cell': 510,
-            'rating_cell': 590,
-            'downloads_cell': 660,
-            'acversion_cell': 700,
-            'version_cell': 730
+            'rating_cell': 595,
+            'downloads_cell': 665,
+            'acversion_cell': 705,
+            'version_cell': 735
         },
         'cellXSize': {
             'dl_cell': 25,
             'track_cell': 250,
-            'author_cell': 175,
+            'author_cell': 185,
             'trim_cell': 50,
             'bestlap_cell': 90,
             'rating_cell': 70,
