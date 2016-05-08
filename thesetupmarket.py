@@ -290,9 +290,6 @@ def initUploadSection():
     current_trackId = tsm.get_trackid_from_api(track_ac_code)
     ac.log('TheSetupMarket logs | current_trackId = ' + str(current_trackId))
 
-    # Get all users uploaded setups
-    userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
-
     # Get all the files names in the current track folder
     allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
 
@@ -308,6 +305,9 @@ def initUploadSection():
     if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
         ac.log('TheSetupMarket logs | disabling uploading...')
         uploadAvailability = False
+    else:
+        # Get all users uploaded setups
+        userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
 
     # Prepare the upload section GUI.
     initUploadSectionGUI()
@@ -481,7 +481,11 @@ def initUploadSectionGUI():
     ac.drawBorder(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
     ac.addOnClickedListener(uploadSectionGeneralElements['uploadTypeSwitcherButton'], onUploadTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'center')
-    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+
+    if uploadAvailability:
+        ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    else:
+        ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
 
     # Configure the button to switch to Update
     ac.setPosition(uploadSectionGeneralElements['updateTypeSwitcherButton'], 396, 226)
@@ -494,7 +498,11 @@ def initUploadSectionGUI():
     ac.drawBorder(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
     ac.addOnClickedListener(uploadSectionGeneralElements['updateTypeSwitcherButton'], onUpdateTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'center')
-    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+
+    if uploadAvailability:
+        ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    else:
+        ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
 
     # Configure the button to switch to Delete
     # ac.setPosition(uploadSectionGeneralElements['deleteTypeSwitcherButton'], 426, 226)
@@ -960,7 +968,7 @@ def showUserSetupsListingTable():
 
 
 def showUpdateUserSetupDetails(setupDetails):
-    global currentUpdateTrim, currentUpdateBestlap, currentUpdateComments, currentUpdateFileName
+    global currentUpdateTrim, currentUpdateBestlap, currentUpdateComments, currentUpdateFileName, currentUpdateBaseline
 
     ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 0)
 
@@ -993,6 +1001,12 @@ def showUpdateUserSetupDetails(setupDetails):
     currentUpdateTrim = setupDetails['type']
     currentUpdateBestlap = setupDetails['best_time']
     currentUpdateComments = setupDetails['comments']
+
+    if setupDetails['track']['_id'] == '55db6db13cc3a26dcae7116d':
+        currentUpdateBaseline = True
+    else:
+        currentUpdateBaseline = False
+
 
     if setupDetails['track']['_id'] == '55db6db13cc3a26dcae7116d':
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Baseline setup')
@@ -1346,6 +1360,8 @@ def onRefreshUpdateSectionButtonClick(*args):
     ac.setText(updateSectionElements['updateMessageLabel'], 'Loading...')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
 
+    unselectAllUserUpdateSetups()
+
     userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
 
     # Get all the files names in the current track folder
@@ -1367,15 +1383,17 @@ def onRefreshUpdateSectionButtonClick(*args):
 
 
 def onUpdateBaselineSelectorButtonClick(*args):
-    global currentUploadBaseline
+    global currentUpdateBaseline
     ac.log('TheSetupMarket logs | onUpdateBaselineSelectorButtonClick')
 
-    if ac.getText(updateSectionElements['baselineSelectorButton']) == 'Track Specific':
+    if not currentUpdateBaseline:
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Any tracks')
-        currentUploadBaseline = True
+        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 0, 0, 0)
+        currentUpdateBaseline = True
     else:
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
-        currentUploadBaseline = False
+        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
+        currentUpdateBaseline = False
 
 
 def onUpdateFileSelectorButtonClick(*args):
@@ -1400,7 +1418,7 @@ def onUpdateUploadButtonClick(*args):
     ac.setText(updateSectionElements['updateMessageLabel'], 'Uploading...')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
 
-    tsm.updateSetup(currentCarName, currentTrackBaseName, currentUpdateFileName, currentUpdateSetupId, current_carId, current_trackId, current_ac_version, currentUpdateTrim, currentUploadBaseline, currentUpdateBestlap, currentUpdateComments, refreshUpdateUserSetupsAfterUpdate)
+    tsm.updateSetup(currentCarName, currentTrackBaseName, currentUpdateFileName, currentUpdateSetupId, current_carId, current_trackId, current_ac_version, currentUpdateTrim, currentUpdateBaseline, currentUpdateBestlap, currentUpdateComments, refreshUpdateUserSetupsAfterUpdate)
 
 
 def onUploadTypeSwitcherButtonClick(*args):
@@ -1434,7 +1452,10 @@ def onUpdateTypeSwitcherButtonClick(*args):
 def onSelectUserSetupUpdateButton1Clicked(*args):
     global currentUpdateSetupId
 
+    hideUpdateUserSetupDetails()
+
     ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
 
     currentUpdateSetupId = updateEventInfos['setupIds'][0]
 
@@ -1452,7 +1473,10 @@ def onSelectUserSetupUpdateButton1Clicked(*args):
 def onSelectUserSetupUpdateButton2Clicked(*args):
     global currentUpdateSetupId
 
+    hideUpdateUserSetupDetails()
+
     ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
 
     currentUpdateSetupId = updateEventInfos['setupIds'][1]
 
@@ -1470,7 +1494,10 @@ def onSelectUserSetupUpdateButton2Clicked(*args):
 def onSelectUserSetupUpdateButton3Clicked(*args):
     global currentUpdateSetupId
 
+    hideUpdateUserSetupDetails()
+
     ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
 
     currentUpdateSetupId = updateEventInfos['setupIds'][2]
 
@@ -1488,7 +1515,10 @@ def onSelectUserSetupUpdateButton3Clicked(*args):
 def onSelectUserSetupUpdateButton4Clicked(*args):
     global currentUpdateSetupId
 
+    hideUpdateUserSetupDetails()
+
     ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
 
     currentUpdateSetupId = updateEventInfos['setupIds'][3]
 
@@ -1506,7 +1536,10 @@ def onSelectUserSetupUpdateButton4Clicked(*args):
 def onSelectUserSetupUpdateButton5Clicked(*args):
     global currentUpdateSetupId
 
+    hideUpdateUserSetupDetails()
+
     ac.setText(updateSectionElements['updateOptionsMessageLabel'], 'Loading...')
+    ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 1)
 
     currentUpdateSetupId = updateEventInfos['setupIds'][4]
 
