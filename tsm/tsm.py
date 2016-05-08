@@ -191,7 +191,7 @@ def getUserSetups(userTSMId, car_id, track_id):
     for setup in setups:
 
         if setup['car']['_id'] == car_id:
-            if setup['track']['_id'] == track_id:
+            if setup['track']['_id'] == track_id or setup['track']['_id'] == '55db6db13cc3a26dcae7116d':
                 trackSpecificSetups.append(setup)
             else:
                 otherTrackSetups.append(setup)
