@@ -813,20 +813,27 @@ def showUploadedMessage(msg):
 
 
 def refreshSetupsListingTable():
+    ac.log('TheSetupMarket logs | refreshSetupsListingTable')
     # If there is setups for the default type, update the table.
     if len(setups[activeSetupType]) > 0:
+        ac.log('TheSetupMarket logs | refreshSetupsListingTable - len(setups[activeSetupType]) > 0')
         # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
         if len(setups[activeSetupType]) > GUIConfig.GUIConstants['setupsPerPage']:
+            ac.log('TheSetupMarket logs | refreshSetupsListingTable - more than 5 setups')
+
             updateSetupsListingTable(setups[activeSetupType][:5])
             updatePageSpinner(math.ceil(len(setups[activeSetupType]) / GUIConfig.GUIConstants['setupsPerPage']), 1)
         else:
+            ac.log('TheSetupMarket logs | refreshSetupsListingTable - less than 5 setups')
+
             updateSetupsListingTable(setups[activeSetupType])
 
     # if there is no setups for this type, show empty table label.
     else:
+        ac.log('TheSetupMarket logs | refreshSetupsListingTable - no setups')
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
         hideSetupsListingTable()
-        #updateSetupsListingTable(setups[activeSetupType][:5])
+        updateSetupsListingTable(setups[activeSetupType])
 
 
 def updateSetupsListingTable(setups):
@@ -918,7 +925,8 @@ def showUploadNewSection():
 
 def hideUploadNewSection():
     for key, element in uploadSectionElements.items():
-        ac.setVisible(element, 0)
+        if key != 'refreshUploadGUIButton':
+            ac.setVisible(element, 0)
 
     ac.setVisible(updateListingTablePageSpinner, 0)
 
@@ -1253,6 +1261,7 @@ def onRefreshSetupsButtonClick(*args):
     ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Loading...')
 
     # Get setups from api.
+    ac.log('TheSetupMarket logs | onRefreshSetupsButtonClick - getting setups')
     setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
 
     refreshSetupsListingTable()
