@@ -50,7 +50,7 @@ def async(func):
 
 
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, updateListingTable, listingTableMisc, listingUpdateTableMisc, activeSetupType, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, currentUploadType, userSetupListingTable
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, updateListingTable, listingTableMisc, listingUpdateTableMisc, activeSetupType, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 800, 420)
@@ -224,8 +224,6 @@ def acMain(ac_version):
         }
     }
 
-    currentUploadType = 'new'
-
     # Get current car/track/layout.
     currentCarName = ac.getCarName(0)
     currentTrackBaseName = ac.getTrackName(0)
@@ -305,6 +303,7 @@ def initUploadSection():
     if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
         ac.log('TheSetupMarket logs | disabling uploading...')
         uploadAvailability = False
+        userTSMSetups = []
     else:
         # Get all users uploaded setups
         userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
@@ -745,7 +744,12 @@ def initUploadSectionGUI():
 def refreshUploadSection():
     if uploadAvailability:
         ac.log('TheSetupMarket logs | refreshUploadSection : if uploadAvailability:')
+        # Hide the upload message label
         ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
+        # Show the upload sections switcher buttons.
+        ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+        ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+
         showUploadNewSection()
     else:
         ac.log('TheSetupMarket logs | refreshUploadSection : else uploadAvailability:')
@@ -1069,14 +1073,17 @@ def updateUserSetupsPageSpinner(pageCount, currentValue):
 def refreshUserSetupsListingTable():
     ac.log('TheSetupMarket logs | refreshUserSetupsListingTable')
     # If there is setups for the current track, update the table.
-    if len(userTSMSetups['trackSpecific']) > 0:
+    if len(userTSMSetups) > 0 and len(userTSMSetups['trackSpecific']) > 0:
         # If there is more setups than setupsPerPage, update the table with 5 first items and a spinner
         if len(userTSMSetups['trackSpecific']) > GUIConfig.GUIConstants['setupsPerPage']:
             updateUserSetupsListingTable(userTSMSetups['trackSpecific'][:5])
             updateUserSetupsPageSpinner(math.ceil(len(userTSMSetups['trackSpecific']) / GUIConfig.GUIConstants['setupsPerPage']), 1)
         else:
             updateUserSetupsListingTable(userTSMSetups['trackSpecific'])
-
+    else:
+        # Means we dont have any setups uploaded for this user.
+        ac.log('TheSetupMarket logs | refreshUserSetupsListingTable - No setups to update')
+        updateUserSetupsListingTable([])
     # if there is no setups for this type, show empty table label.
 
 
@@ -1362,8 +1369,8 @@ def onRefreshUploadSectionButtonClick(*args):
 
 @async
 def onRefreshUpdateSectionButtonClick(*args):
-    global allSetupsFileNamesInFolder, currentUploadFileName, currentUploadFileName, uploadAvailability, userTSMSetups
-    ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick')
+    global allSetupsFileNamesInFolder, uploadAvailability, userTSMSetups
+    ac.log('TheSetupMarket logs | onRefreshUpdateSectionButtonClick')
 
     hideUpdateSection()
     ac.setText(updateSectionElements['updateMessageLabel'], 'Loading...')
@@ -1431,12 +1438,9 @@ def onUpdateUploadButtonClick(*args):
 
 
 def onUploadTypeSwitcherButtonClick(*args):
-    global currentUploadType
-
     ac.log('onUploadTypeSwitcherButtonClick')
     unselectAllUserUpdateSetups()
     hideUpdateSection()
-    currentUploadType = 'new'
     showUploadNewSection()
     onRefreshUploadSectionButtonClick()
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
@@ -1444,14 +1448,10 @@ def onUploadTypeSwitcherButtonClick(*args):
 
 
 def onUpdateTypeSwitcherButtonClick(*args):
-    global currentUploadType, currentUpdateSetupId
-
     ac.log('onUpdateTypeSwitcherButtonClick')
     hideUploadNewSection()
-    currentUploadType = 'update'
-
     refreshUpdateSection()
-
+    ac.log('onUpdateTypeSwitcherButtonClick - after refreshUpdateSection')
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0, 0, 0)
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1)
 
