@@ -52,9 +52,14 @@ except Exception as e:
 def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | error requesting setups from tsm api: ' + str(e))
+
+    try:
         setups = resp.json()
     except Exception as e:
-        ac.log('TheSetupMarket logs | error requesting setups from tsm api: ' + traceback.format_exc())
+        ac.log('TheSetupMarket logs | error  resp.json(): ' + str(e))
+
 
     trackSpecificSetups = []
     anyTracksSetups = []
@@ -90,7 +95,7 @@ def downloadSetup(setup_id, setup_file_name, car_ac_code, track_baseName, track_
     try:
         r = requests.get(url)
     except:
-        ac.console('TheSetupMarket logs | failed at r = requests.get(url)')
+        ac.log('TheSetupMarket logs | downloadSetup failed at r = requests.get(url)')
         r = {}
         r['status_code'] = ''
 
@@ -165,8 +170,12 @@ def uploadSetup(userTSMId, ac_version, user_steamId, filename, trim, baseline, c
 
     trim = trim.lower()
 
-    r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': ac_version,
-                                             'user_id': userTSMId, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
+    try:
+        r = requests.post(url, files=file, data={'file_name': filename, 'sim_id': sim_id, 'sim_version': ac_version,
+        'user_id': userTSMId, 'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': '', 'comments': ''})
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | uploadSetup request failed! Status code: ' + str(e))
+
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | upload request success! Status code: ' + str(r.status_code))
@@ -181,15 +190,18 @@ def uploadSetup(userTSMId, ac_version, user_steamId, filename, trim, baseline, c
 def getUserSetups(userTSMId, car_id, track_id):
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setups-by-user/' + userTSMId)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | getUserSetups error request!: ' + str(e))
+
+    try:
         setups = resp.json()
     except Exception as e:
-        ac.log('TheSetupMarket logs | error requesting user setups from tsm api: ' + traceback.format_exc())
+        ac.log('TheSetupMarket logs | getUserSetups error resp.json(): ' + str(e))
 
     trackSpecificSetups = []
     otherTrackSetups = []
 
     for setup in setups:
-
         if setup['car']['_id'] == car_id:
             if setup['track']['_id'] == track_id or setup['track']['_id'] == '55db6db13cc3a26dcae7116d':
                 trackSpecificSetups.append(setup)
@@ -207,9 +219,13 @@ def getUserSetups(userTSMId, car_id, track_id):
 def getSetupDetails(setupId, callback):
     try:
         resp = requests.get('http://thesetupmarket.com/api/get-setup/' + setupId)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | error requesting user setup details from tsm api: ' + str(e))
+
+    try:
         setupDetail = resp.json()
     except Exception as e:
-        ac.log('TheSetupMarket logs | error requesting user setup details from tsm api: ' + traceback.format_exc())
+        ac.log('TheSetupMarket logs | error requesting user setups from tsm api: ' + str(e))
 
     callback(setupDetail)
 
@@ -231,9 +247,13 @@ def updateSetup(car_ac_code, track_baseName, file_name, setup_id, car_id, track_
 
     trim = trim.lower()
 
-    r = requests.post(url, files=file,
-                      data={'sim_id': sim_id, 'setup_id': setup_id, 'file_name': file_name, 'sim_version': sim_version,
-                            'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': best_time, 'comments': comments})
+    try:
+        r = requests.post(url, files=file,
+                          data={'sim_id': sim_id, 'setup_id': setup_id, 'file_name': file_name, 'sim_version': sim_version,
+                                'car_id': car_id, 'track_id': track_id, 'trim': trim, 'best_laptime': best_time, 'comments': comments})
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | updateSetup error request!: ' + str(e))
+
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | update request success! Status code: ' + str(r.status_code))
@@ -268,7 +288,11 @@ def get_personal_folder():
 def get_ac_version_from_api():
     url = 'http://thesetupmarket.com/api/get-sim-infos/Assetto%20Corsa'
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | get_ac_version_from_api error request!: ' + str(e))
+
 
     if r.status_code == 200:
         try:
@@ -288,7 +312,10 @@ def get_ac_version_from_api():
 def get_carid_from_api(ac_code):
     url = 'http://thesetupmarket.com/api/get-car-by-accode/' + ac_code
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | get_carid_from_api error request!: ' + str(e))
 
     if r.status_code == 200:
         try:
@@ -307,7 +334,10 @@ def get_carid_from_api(ac_code):
 def get_trackid_from_api(ac_code):
     url = 'http://thesetupmarket.com/api/get-track-by-accode/' + ac_code
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | get_trackid_from_api error request!: ' + str(e))
 
     if r.status_code == 200:
         try:
@@ -325,7 +355,10 @@ def get_trackid_from_api(ac_code):
 def getUserTSMIdWithSteamID(steamID):
     url = 'http://thesetupmarket.com/api/get-user-by-steamId/' + str(steamID)
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | getUserTSMIdWithSteamID error request!: ' + str(e))
 
     if r.status_code == 200:
         try:
@@ -346,7 +379,11 @@ def checkIfUserExistsOnTSM(userSteamID):
     userExists = False
 
     url = 'http://thesetupmarket.com/api/get-user-by-sci/' + str(userSteamID)
-    r = requests.get(url)
+
+    try:
+        r = requests.get(url)
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM error request!: ' + str(e))
 
     if r.status_code == 200:
         ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM status = 200')
