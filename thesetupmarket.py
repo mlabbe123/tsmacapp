@@ -797,6 +797,8 @@ def refreshUpdateSection():
             # Check if there are trackSpecific setups
             if len(userTSMSetups['trackSpecific']) > 0:
                 ac.log('TheSetupMarket logs | trackSpecific setups found')
+                ac.setVisible(updateSectionElements['updateMessageLabel'], 0)
+                ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 0)
                 showUpdateSection()
             else:
                 ac.log('TheSetupMarket logs | NO trackSpecific setups found')
@@ -1373,6 +1375,7 @@ def onRefreshUpdateSectionButtonClick(*args):
     ac.log('TheSetupMarket logs | onRefreshUpdateSectionButtonClick')
 
     hideUpdateSection()
+    hideUploadNewSection()
     ac.setText(updateSectionElements['updateMessageLabel'], 'Loading...')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
 
@@ -1451,7 +1454,7 @@ def onUpdateTypeSwitcherButtonClick(*args):
     ac.log('onUpdateTypeSwitcherButtonClick')
     hideUploadNewSection()
     refreshUpdateSection()
-    ac.log('onUpdateTypeSwitcherButtonClick - after refreshUpdateSection')
+
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0, 0, 0)
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1)
 
