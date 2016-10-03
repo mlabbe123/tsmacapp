@@ -56,7 +56,13 @@ def acMain(ac_version):
     ac.setSize(appWindow, 800, 420)
 
     if importError:
-        initAppWithImportError()
+        ac.log('TheSetupMarket logs | errors in imports')
+        initAppWithError()
+        return "The Setup Market"
+
+    if tsm.getUserTSMIdWithSteamID('0') == '502':
+        ac.log('TheSetupMarket logs | Server is down')
+        initAppWithError('SERVER_DOWN')
         return "The Setup Market"
 
     # Initialize the listing tables empty and loading labels.
@@ -224,7 +230,7 @@ def acMain(ac_version):
         }
     }
 
-    # Get current car/track/layout.
+    # Get current c\/track/layout.
     currentCarName = ac.getCarName(0)
     currentTrackBaseName = ac.getTrackName(0)
     currentTrackLayout = ac.getTrackConfiguration(0)
@@ -246,7 +252,7 @@ def acMain(ac_version):
 
 
 def initUploadSection():
-    global userSteamId, userTSMId, userExists, allSetupsFileNamesInFolder, currentUploadFileName, currentUpdateFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId, userTSMSetups
+    global userSteamId, userTSMId, allSetupsFileNamesInFolder, currentUploadFileName, currentUpdateFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId, userTSMSetups
 
     ##########################
     # Set the static variables
@@ -272,10 +278,6 @@ def initUploadSection():
     userTSMId = tsm.getUserTSMIdWithSteamID(userSteamId)
     ac.log('TheSetupMarket logs | userTSMId = ' + str(userTSMId))
 
-    # Check TSM database to see if user exists
-    userExists = tsm.checkIfUserExistsOnTSM(userSteamId)
-    ac.log('TheSetupMarket logs | userExists = ' + str(userExists))
-
     # Get the active AC version
     current_ac_version = tsm.get_ac_version_from_api()
     ac.log('TheSetupMarket logs | current_ac_version = ' + str(current_ac_version))
@@ -300,7 +302,7 @@ def initUploadSection():
         currentUpdateFileName = 'No file in track folder'
 
     # Check if we have errors that would break the upload function. If so, disable uploading.
-    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userTSMId:
         ac.log('TheSetupMarket logs | disabling uploading...')
         uploadAvailability = False
         userTSMSetups = []
@@ -319,26 +321,32 @@ def acUpdate(delta_t):
     doNothing = 1
 
 
-def initAppWithImportError():
-    appImportErrorLabel = ac.addLabel(appWindow, 'There has been an error loading the app.')
-    ac.setPosition(appImportErrorLabel, 0, 90)
-    ac.setSize(appImportErrorLabel, 800, 22)
-    ac.setFontAlignment(appImportErrorLabel, 'center')
+def initAppWithError(state='IMPORT_ERROR'):
+    if state=='IMPORT_ERROR':
+        appImportErrorLabel = ac.addLabel(appWindow, 'There has been an error loading the app.')
+        ac.setPosition(appImportErrorLabel, 0, 90)
+        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel, 'center')
 
-    appImportErrorLabel2 = ac.addLabel(appWindow, 'You can look in "Documents/Assetto Corsa/logs/py_log.txt", search for "TheSetupMarket logs"')
-    ac.setPosition(appImportErrorLabel2, 0, 150)
-    ac.setSize(appImportErrorLabel2, 800, 22)
-    ac.setFontAlignment(appImportErrorLabel2, 'center')
+        appImportErrorLabel2 = ac.addLabel(appWindow, 'You can look in "Documents/Assetto Corsa/logs/py_log.txt", search for "TheSetupMarket logs"')
+        ac.setPosition(appImportErrorLabel2, 0, 150)
+        ac.setSize(appImportErrorLabel2, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel2, 'center')
 
-    appImportErrorLabel3 = ac.addLabel(appWindow, 'and post the results in The Setup Market App thread on the AC forums, section apps.')
-    ac.setPosition(appImportErrorLabel3, 0, 172)
-    ac.setSize(appImportErrorLabel3, 800, 22)
-    ac.setFontAlignment(appImportErrorLabel3, 'center')
+        appImportErrorLabel3 = ac.addLabel(appWindow, 'and post the results in The Setup Market App thread on the AC forums, section apps.')
+        ac.setPosition(appImportErrorLabel3, 0, 172)
+        ac.setSize(appImportErrorLabel3, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel3, 'center')
 
-    appImportErrorLabel4 = ac.addLabel(appWindow, 'Sorry for the inconvenience.')
-    ac.setPosition(appImportErrorLabel4, 0, 232)
-    ac.setSize(appImportErrorLabel4, 800, 22)
-    ac.setFontAlignment(appImportErrorLabel4, 'center')
+        appImportErrorLabel4 = ac.addLabel(appWindow, 'Sorry for the inconvenience.')
+        ac.setPosition(appImportErrorLabel4, 0, 232)
+        ac.setSize(appImportErrorLabel4, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel4, 'center')
+    elif state=='SERVER_DOWN':
+        appImportErrorLabel = ac.addLabel(appWindow, 'The server is down, sorry for the inconvenience.')
+        ac.setPosition(appImportErrorLabel, 0, 172)
+        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel, 'center')
 
 
 def initGUI(appWindow):
@@ -753,7 +761,7 @@ def refreshUploadSection():
         showUploadNewSection()
     else:
         ac.log('TheSetupMarket logs | refreshUploadSection : else uploadAvailability:')
-        if not userExists:
+        if not userTSMId:
             ac.log('TheSetupMarket logs | refreshUploadSection: User steamCommunityID not found in TSM DB')
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'Go to thesetupmarket.com to create an account and link it with your steam account')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
@@ -940,7 +948,9 @@ def hideUploadNewSection():
 def showUpdateSection():
     for key, element in updateSectionElements.items():
         # Check also if a message should be displayed (if the user have no uploaded setup to update for exemple)
-        if key != 'updateMessageLabel':
+        if key == 'updateMessageLabel':
+            ac.setVisible(element, 0)
+        else:
             ac.setVisible(element, 1)
 
     refreshUserSetupsListingTable()
@@ -1358,7 +1368,7 @@ def onRefreshUploadSectionButtonClick(*args):
     ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
 
     # Check if we have errors that would break the upload function. If so, disable uploading.
-    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userTSMId:
         ac.log('TheSetupMarket logs | onRefreshUploadSectionButtonClick: disabling uploading...')
         uploadAvailability = False
 
@@ -1390,7 +1400,7 @@ def onRefreshUpdateSectionButtonClick(*args):
 
     # Check if we have errors that would break the update function. If so, disable updating.
     if not current_ac_version or not current_carId or not current_trackId or len(
-            allSetupsFileNamesInFolder) == 0 or not userSteamId or not userExists:
+            allSetupsFileNamesInFolder) == 0 or not userSteamId or not userTSMId:
         ac.log('TheSetupMarket logs | onRefreshUpdateSectionButtonClick: disabling updating...')
         uploadAvailability = False
 

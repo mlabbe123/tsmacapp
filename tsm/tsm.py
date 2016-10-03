@@ -17,7 +17,11 @@ from os.path import dirname, realpath
 import functools
 import threading
 
-from tsm.steam_utils.steam_info import get_steam_username, get_steam_id
+try:
+    from tsm.steam_utils.steam_info import get_steam_username, get_steam_id
+except:
+    ac.log('TheSetupMarket logs | error loading get_steam_username, get_steam_id: ' + traceback.format_exc())
+    raise
 
 def async(func):
     @functools.wraps(func)
@@ -166,7 +170,7 @@ def uploadSetup(userTSMId, ac_version, user_steamId, filename, trim, baseline, c
     if baseline:
         track_id = '55db6db13cc3a26dcae7116d'
     else:
-        track_id = track_id # This is the track_id for Nordschleife Endurance
+        track_id = track_id
 
     trim = trim.lower()
 
@@ -197,6 +201,7 @@ def getUserSetups(userTSMId, car_id, track_id):
         setups = resp.json()
     except Exception as e:
         ac.log('TheSetupMarket logs | getUserSetups error resp.json(): ' + str(e))
+        setups = []
 
     trackSpecificSetups = []
     otherTrackSetups = []
@@ -354,6 +359,7 @@ def get_trackid_from_api(ac_code):
 
 def getUserTSMIdWithSteamID(steamID):
     url = 'http://thesetupmarket.com/api/get-user-by-steamId/' + str(steamID)
+    userTSMId = False
 
     try:
         r = requests.get(url)
@@ -366,35 +372,11 @@ def getUserTSMIdWithSteamID(steamID):
             userTSMId = request_json['_id']
         except:
             ac.log('TheSetupMarket logs | getUserTSMIdWithSteamID failed at request_json = r.json() = ')
-            userTSMId = False
     else:
         ac.log('TheSetupMarket logs | getUserTSMIdWithSteamID failed. status_code = ' + str(r.status_code))
-        userTSMId = False
+        return '502'
 
     return userTSMId
-
-
-def checkIfUserExistsOnTSM(userSteamID):
-    ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM userSteamID = ' + str(userSteamID))
-    userExists = False
-
-    url = 'http://thesetupmarket.com/api/get-user-by-sci/' + str(userSteamID)
-
-    try:
-        r = requests.get(url)
-    except requests.exceptions.RequestException as e:
-        ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM error request!: ' + str(e))
-
-    if r.status_code == 200:
-        ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM status = 200')
-        try:
-            request_json = r.json()
-
-            userExists = True
-        except:
-            ac.log('TheSetupMarket logs | checkIfUserExistsOnTSM failed at request_json = r.json()')
-
-    return userExists
 
 
 def getUserSteamId():
