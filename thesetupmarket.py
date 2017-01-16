@@ -80,7 +80,7 @@ def acMain(ac_version):
     ac.initFont(0, "OpenSans", 1, 1)
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 800, 420)
+    ac.setSize(appWindow, 1200, 420)
 
     if importError:
         ac.log('TheSetupMarket logs | errors in imports')
@@ -931,11 +931,21 @@ def updateSetupsListingTable(setups):
                     totalRating += rating['rating']
 
                 if totalRating == 0:
-                    rating = 'n/a'
+                    ac.setText(labelCtrl, 'n/a')
                 else:
-                    rating = str(totalRating)
+                    if totalRating <= 1:
+                        ac.setText(labelCtrl, u'\u2605')
+                    elif totalRating > 1 and totalRating <= 2:
+                        ac.setText(labelCtrl, u'\u2605')
+                    elif totalRating > 2 and totalRating <= 3:
+                        ac.setText(labelCtrl, u'\u2605'u'\u2605')
+                    elif totalRating > 3 and totalRating <= 4:
+                        ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605')
+                    elif totalRating > 4 and totalRating < 5:
+                        ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605'u'\u2605')
+                    elif totalRating == 5:
+                        ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605'u'\u2605'u'\u2605')
 
-                ac.setText(labelCtrl, str(rating))
 
             elif cellName == 'downloads_cell':
                 ac.setText(labelCtrl, str(setup['downloads']))
