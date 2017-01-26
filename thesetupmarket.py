@@ -219,6 +219,38 @@ def initGUI(appWindow):
         'loadingLabel': {
             'label': ac.addLabel(appWindow, ''),
             'text': 'Loading...'
+        },
+        'ratingDialogTitle': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Please rate this setup'
+        },
+        'ratingDialog1Star': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': u'\u2605'
+        },
+        'ratingDialog2Star': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': u'\u2605'
+        },
+        'ratingDialog3Star': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': u'\u2605'
+        },
+        'ratingDialog4Star': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': u'\u2605'
+        },
+        'ratingDialog5Star': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': u'\u2605'
+        },
+        'ratingDialogSendButton': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Send'
+        },
+        'ratingDialogCancelButton': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Cancel'
         }
     }
 
@@ -226,6 +258,7 @@ def initGUI(appWindow):
     listingTable = OrderedDict([
         (1, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'rate_cell': ac.addLabel(appWindow, ''),
             'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
@@ -237,6 +270,7 @@ def initGUI(appWindow):
         }),
         (2, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'rate_cell': ac.addLabel(appWindow, ''),
             'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
@@ -248,6 +282,7 @@ def initGUI(appWindow):
         }),
         (3, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'rate_cell': ac.addLabel(appWindow, ''),
             'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
@@ -259,6 +294,7 @@ def initGUI(appWindow):
         }),
         (4, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'rate_cell': ac.addLabel(appWindow, ''),
             'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
@@ -270,6 +306,7 @@ def initGUI(appWindow):
         }),
         (5, {
             'dl_cell': ac.addLabel(appWindow, ''),
+            'rate_cell': ac.addLabel(appWindow, ''),
             'track_cell': ac.addLabel(appWindow, ''),
             'author_cell': ac.addLabel(appWindow, ''),
             'trim_cell': ac.addLabel(appWindow, ''),
@@ -400,14 +437,14 @@ def initGUI(appWindow):
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
-    addTableCell('Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 30, 53, 'center', False)
-    addTableCell('Author', 185, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 275, 53, 'center', False)
-    addTableCell('Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 460, 53, 'center', False)
-    addTableCell('Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 510, 53, 'center', False)
-    addTableCell('Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 595, 53, 'center', False)
-    addTableCell('Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 665, 53, 'center', False)
-    addTableCell('AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 705, 53, 'center', False)
-    addTableCell('Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 735, 53, 'center', False)
+    addTableCell('Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 90, 53, 'center', False)
+    addTableCell('Author', 185, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 335, 53, 'center', False)
+    addTableCell('Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 520, 53, 'center', False)
+    addTableCell('Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 570, 53, 'center', False)
+    addTableCell('Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 655, 53, 'center', False)
+    addTableCell('Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 725, 53, 'center', False)
+    addTableCell('AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 765, 53, 'center', False)
+    addTableCell('Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 795, 53, 'center', False)
 
     # Init the setups listing table with empty labels
     yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
@@ -437,6 +474,18 @@ def initGUI(appWindow):
                     ac.addOnClickedListener(label, onDownloadButton4Clicked)
                 elif rowNumber == 5:
                     ac.addOnClickedListener(label, onDownloadButton5Clicked)
+            elif cellId == 'rate_cell':
+                if rowNumber == 1:
+                    ac.addOnClickedListener(label, onRateButton1Clicked)
+                elif rowNumber == 2:
+                    ac.addOnClickedListener(label, onRateButton2Clicked)
+                elif rowNumber == 3:
+                    ac.addOnClickedListener(label, onRateButton3Clicked)
+                elif rowNumber == 4:
+                    ac.addOnClickedListener(label, onRateButton4Clicked)
+                elif rowNumber == 5:
+                    ac.addOnClickedListener(label, onRateButton5Clicked)
+
 
 
         yPos += GUIConfig.GUIConstants['tableLayout']['cellHeight'] + 1
@@ -452,6 +501,38 @@ def initGUI(appWindow):
         ac.drawBorder(labelCtrl, 0)
         ac.setVisible(labelCtrl, 0)
         ac.setFontAlignment(labelCtrl, 'center')
+
+    # rating dialog items
+    ac.setPosition(listingTableMisc['ratingDialogTitle']['label'], 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] / 2)
+
+    ac.setSize(listingTableMisc['ratingDialog1Star']['label'], 50, 50)
+    ac.setPosition(listingTableMisc['ratingDialog1Star']['label'], 400, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 1.5)
+
+    ac.setSize(listingTableMisc['ratingDialog2Star']['label'], 50, 50)
+    ac.setPosition(listingTableMisc['ratingDialog2Star']['label'], 450, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 1.5)
+
+    ac.setSize(listingTableMisc['ratingDialog3Star']['label'], 50, 50)
+    ac.setPosition(listingTableMisc['ratingDialog3Star']['label'], 500,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 1.5)
+
+    ac.setSize(listingTableMisc['ratingDialog4Star']['label'], 50, 50)
+    ac.setPosition(listingTableMisc['ratingDialog4Star']['label'], 550,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 1.5)
+
+    ac.setSize(listingTableMisc['ratingDialog5Star']['label'], 50, 50)
+    ac.setPosition(listingTableMisc['ratingDialog5Star']['label'], 600,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 1.5)
+
+    ac.setSize(listingTableMisc['ratingDialogSendButton']['label'], 50, 100)
+    ac.setPosition(listingTableMisc['ratingDialogSendButton']['label'], 400, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 3)
+
+    ac.setSize(listingTableMisc['ratingDialogCancelButton']['label'], 50, 100)
+    ac.setPosition(listingTableMisc['ratingDialogCancelButton']['label'], 500,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 3)
 
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
@@ -911,6 +992,9 @@ def updateSetupsListingTable(setups):
 
             if cellName == 'dl_cell':
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
+            if cellName == 'rate_cell':
+                ac.setBackgroundColor(labelCtrl,1,1,1)
+                ac.setText(labelCtrl, 'Rate')
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'author_cell':
@@ -1302,6 +1386,35 @@ def onDownloadButton5Clicked(*args):
         ac.setText(listingTableMisc['emptyRowLabel']['label'], 'Downloading...')
 
         tsm.downloadSetup(eventInfos['setupIds'][4], eventInfos['setupFilenames'][4], currentCarName, currentTrackBaseName, currentTrackLayout, refreshSetupsListingTable)
+
+
+def onRateButton1Clicked(*args):
+    ac.log('TheSetupMarket logs | rate button1 clicked')
+    if eventInfos['setupIds'][0] != '':
+        hideSetupsListingTable()
+
+        # Show the rating dialog
+        ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialog1Star']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialog2Star']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialog3Star']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialog4Star']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialog5Star']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 1)
+        ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
+
+
+def onRateButton2Clicked(*args):
+    ac.log('TheSetupMarket logs | rate button2 clicked')
+
+def onRateButton3Clicked(*args):
+    ac.log('TheSetupMarket logs | rate button3 clicked')
+
+def onRateButton4Clicked(*args):
+    ac.log('TheSetupMarket logs | rate button4 clicked')
+
+def onRateButton5Clicked(*args):
+    ac.log('TheSetupMarket logs | rate button5 clicked')
 
 
 @async

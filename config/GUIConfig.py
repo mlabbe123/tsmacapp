@@ -22,17 +22,19 @@ GUIConstants = {
         'cellHeight': 21,
         'xPos': {
             'dl_cell': 5,
-            'track_cell': 30,
-            'author_cell': 275,
-            'trim_cell': 460,
-            'bestlap_cell': 510,
-            'rating_cell': 595,
-            'downloads_cell': 665,
-            'acversion_cell': 705,
-            'version_cell': 735
+            'rate_cell': 30,
+            'track_cell': 90,
+            'author_cell': 335,
+            'trim_cell': 520,
+            'bestlap_cell': 570,
+            'rating_cell': 655,
+            'downloads_cell': 725,
+            'acversion_cell': 765,
+            'version_cell': 795
         },
         'cellXSize': {
             'dl_cell': 25,
+            'rate_cell': 60,
             'track_cell': 250,
             'author_cell': 185,
             'trim_cell': 50,
