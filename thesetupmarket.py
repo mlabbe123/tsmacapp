@@ -76,6 +76,9 @@ def checkIfServerDown():
 def acMain(ac_version):
     global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, activeSetupType
 
+    # Initialize font // ac.initFont(0,<FONTNAME>,<ITALIC>,<BOLD>)
+    ac.initFont(0, "OpenSans", 1, 1)
+
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 800, 420)
 
@@ -378,7 +381,10 @@ def initGUI(appWindow):
 
     ### Current track section ###
     section1Title = ac.addLabel(appWindow, "Download")
-    ac.setPosition(section1Title, 30, 31)
+    #ac.setCustomFont(<CONTROL_IDENTIFIER>,<FONTNAME>,<ITALIC>,<BOLD>)
+    ac.setCustomFont(section1Title, "OpenSans", 0, 0)
+    ac.setFontSize(section1Title, 20)
+    ac.setPosition(section1Title, 30, 25)
 
     # Setting up the refresh setups button
     refreshSetupsButton = ac.addButton(appWindow, '')
