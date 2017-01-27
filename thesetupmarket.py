@@ -49,8 +49,32 @@ def async(func):
     return wrapper
 
 
+@async
+def checkIfServerDown():
+    global setups
+
+    if tsm.getUserTSMIdWithSteamID('0') == '502':
+        ac.log('TheSetupMarket logs | Server is down')
+        initAppWithError('SERVER_DOWN')
+        return "The Setup Market"
+    else:
+        ac.log('TheSetupMarket logs | Server is up!')
+        ac.setVisible(fetchingServerLabel, 0)
+
+        # Set the base GUI
+        initGUI(appWindow)
+
+        # Init upload section variables
+        initUploadSection()
+
+        # Get setups for current car and track.
+        setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
+
+        refreshSetupsListingTable()
+
+
 def acMain(ac_version):
-    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, setupFilename, setups, listingTable, updateListingTable, listingTableMisc, listingUpdateTableMisc, activeSetupType, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
+    global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, activeSetupType
 
     appWindow = ac.newApp("The Setup Market")
     ac.setSize(appWindow, 800, 420)
@@ -60,10 +84,128 @@ def acMain(ac_version):
         initAppWithError()
         return "The Setup Market"
 
-    if tsm.getUserTSMIdWithSteamID('0') == '502':
-        ac.log('TheSetupMarket logs | Server is down')
-        initAppWithError('SERVER_DOWN')
-        return "The Setup Market"
+    checkIfServerDown()
+
+    # Get current c\/track/layout.
+    currentCarName = ac.getCarName(0)
+    currentTrackBaseName = ac.getTrackName(0)
+    currentTrackLayout = ac.getTrackConfiguration(0)
+    # Set the default active setup type
+    activeSetupType = 'trackSpecific'
+
+    initAppWithLoadingState()
+
+
+def initUploadSection():
+    global userSteamId, userTSMId, allSetupsFileNamesInFolder, currentUploadFileName, currentUpdateFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId, userTSMSetups
+
+    ##########################
+    # Set the static variables
+    ##########################
+    uploadAvailability = True
+    currentUploadTrim = 'Qualy'
+    currentUploadBaseline = False
+
+    if currentTrackLayout != '':
+        track_ac_code = currentTrackBaseName + '-' + currentTrackLayout
+    else:
+        track_ac_code = currentTrackBaseName
+
+    ##########################
+    # Set the dynamic variables
+    ##########################
+
+    # Get the user steamID
+    userSteamId = tsm.getUserSteamId()
+    ac.log('TheSetupMarket logs | userSteamId = ' + str(userSteamId))
+
+    # Get the user TSM id
+    userTSMId = tsm.getUserTSMIdWithSteamID(userSteamId)
+    ac.log('TheSetupMarket logs | userTSMId = ' + str(userTSMId))
+
+    # Get the active AC version
+    current_ac_version = tsm.get_ac_version_from_api()
+    ac.log('TheSetupMarket logs | current_ac_version = ' + str(current_ac_version))
+
+    # Get the carID for the currentCarName
+    current_carId = tsm.get_carid_from_api(currentCarName)
+    ac.log('TheSetupMarket logs | current_carId = ' + str(current_carId))
+
+    # Get the trackID for the track_ac_code
+    current_trackId = tsm.get_trackid_from_api(track_ac_code)
+    ac.log('TheSetupMarket logs | current_trackId = ' + str(current_trackId))
+
+    # Get all the files names in the current track folder
+    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
+
+    # Set the current upload filename
+    if len(allSetupsFileNamesInFolder) > 0:
+        currentUploadFileName = allSetupsFileNamesInFolder[0]
+        currentUpdateFileName = allSetupsFileNamesInFolder[0]
+    else:
+        currentUploadFileName = 'No file in track folder'
+        currentUpdateFileName = 'No file in track folder'
+
+    # Check if we have errors that would break the upload function. If so, disable uploading.
+    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userTSMId:
+        ac.log('TheSetupMarket logs | disabling uploading...')
+        uploadAvailability = False
+        userTSMSetups = []
+    else:
+        # Get all users uploaded setups
+        userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
+
+    # Prepare the upload section GUI.
+    initUploadSectionGUI()
+
+    # Put the right GUI config and values.
+    refreshUploadSection()
+
+
+def acUpdate(delta_t):
+    doNothing = 1
+
+
+def initAppWithError(state='IMPORT_ERROR'):
+    ac.setVisible(fetchingServerLabel, 0)
+
+    if state=='IMPORT_ERROR':
+        appImportErrorLabel = ac.addLabel(appWindow, 'There has been an error loading the app.')
+        ac.setPosition(appImportErrorLabel, 0, 90)
+        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel, 'center')
+
+        appImportErrorLabel2 = ac.addLabel(appWindow, 'You can look in "Documents/Assetto Corsa/logs/py_log.txt", search for "TheSetupMarket logs"')
+        ac.setPosition(appImportErrorLabel2, 0, 150)
+        ac.setSize(appImportErrorLabel2, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel2, 'center')
+
+        appImportErrorLabel3 = ac.addLabel(appWindow, 'and post the results in The Setup Market App thread on the AC forums, section apps.')
+        ac.setPosition(appImportErrorLabel3, 0, 172)
+        ac.setSize(appImportErrorLabel3, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel3, 'center')
+
+        appImportErrorLabel4 = ac.addLabel(appWindow, 'Sorry for the inconvenience.')
+        ac.setPosition(appImportErrorLabel4, 0, 232)
+        ac.setSize(appImportErrorLabel4, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel4, 'center')
+    elif state=='SERVER_DOWN':
+        appImportErrorLabel = ac.addLabel(appWindow, 'The server is down, sorry for the inconvenience.')
+        ac.setPosition(appImportErrorLabel, 0, 172)
+        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setFontAlignment(appImportErrorLabel, 'center')
+
+
+def initAppWithLoadingState():
+    global fetchingServerLabel
+
+    fetchingServerLabel = ac.addLabel(appWindow, 'Fetching server...')
+    ac.setPosition(fetchingServerLabel, 0, 172)
+    ac.setSize(fetchingServerLabel, 800, 22)
+    ac.setFontAlignment(fetchingServerLabel, 'center')
+
+def initGUI(appWindow):
+    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
@@ -229,128 +371,6 @@ def acMain(ac_version):
             'text': 'Loading...'
         }
     }
-
-    # Get current c\/track/layout.
-    currentCarName = ac.getCarName(0)
-    currentTrackBaseName = ac.getTrackName(0)
-    currentTrackLayout = ac.getTrackConfiguration(0)
-    # Set the default active setup type
-    activeSetupType = 'trackSpecific'
-
-    # Set the base GUI
-    initGUI(appWindow)
-
-    # Init upload section variables
-    initUploadSection()
-
-    # Get setups for current car and track.
-    setups = tsm.getSetups(currentCarName, currentTrackBaseName, currentTrackLayout)
-
-    refreshSetupsListingTable()
-
-    return "The Setup Market"
-
-
-def initUploadSection():
-    global userSteamId, userTSMId, allSetupsFileNamesInFolder, currentUploadFileName, currentUpdateFileName, currentUploadTrim, currentUploadBaseline, uploadAvailability, current_ac_version, current_carId, current_trackId, userTSMSetups
-
-    ##########################
-    # Set the static variables
-    ##########################
-    uploadAvailability = True
-    currentUploadTrim = 'Qualy'
-    currentUploadBaseline = False
-
-    if currentTrackLayout != '':
-        track_ac_code = currentTrackBaseName + '-' + currentTrackLayout
-    else:
-        track_ac_code = currentTrackBaseName
-
-    ##########################
-    # Set the dynamic variables
-    ##########################
-
-    # Get the user steamID
-    userSteamId = tsm.getUserSteamId()
-    ac.log('TheSetupMarket logs | userSteamId = ' + str(userSteamId))
-
-    # Get the user TSM id
-    userTSMId = tsm.getUserTSMIdWithSteamID(userSteamId)
-    ac.log('TheSetupMarket logs | userTSMId = ' + str(userTSMId))
-
-    # Get the active AC version
-    current_ac_version = tsm.get_ac_version_from_api()
-    ac.log('TheSetupMarket logs | current_ac_version = ' + str(current_ac_version))
-
-    # Get the carID for the currentCarName
-    current_carId = tsm.get_carid_from_api(currentCarName)
-    ac.log('TheSetupMarket logs | current_carId = ' + str(current_carId))
-
-    # Get the trackID for the track_ac_code
-    current_trackId = tsm.get_trackid_from_api(track_ac_code)
-    ac.log('TheSetupMarket logs | current_trackId = ' + str(current_trackId))
-
-    # Get all the files names in the current track folder
-    allSetupsFileNamesInFolder = tsm.getAllSetupsFromFolder(currentCarName, currentTrackBaseName)
-
-    # Set the current upload filename
-    if len(allSetupsFileNamesInFolder) > 0:
-        currentUploadFileName = allSetupsFileNamesInFolder[0]
-        currentUpdateFileName = allSetupsFileNamesInFolder[0]
-    else:
-        currentUploadFileName = 'No file in track folder'
-        currentUpdateFileName = 'No file in track folder'
-
-    # Check if we have errors that would break the upload function. If so, disable uploading.
-    if not current_ac_version or not current_carId or not current_trackId or len(allSetupsFileNamesInFolder) == 0 or not userSteamId or not userTSMId:
-        ac.log('TheSetupMarket logs | disabling uploading...')
-        uploadAvailability = False
-        userTSMSetups = []
-    else:
-        # Get all users uploaded setups
-        userTSMSetups = tsm.getUserSetups(userTSMId, current_carId, current_trackId)
-
-    # Prepare the upload section GUI.
-    initUploadSectionGUI()
-
-    # Put the right GUI config and values.
-    refreshUploadSection()
-
-
-def acUpdate(delta_t):
-    doNothing = 1
-
-
-def initAppWithError(state='IMPORT_ERROR'):
-    if state=='IMPORT_ERROR':
-        appImportErrorLabel = ac.addLabel(appWindow, 'There has been an error loading the app.')
-        ac.setPosition(appImportErrorLabel, 0, 90)
-        ac.setSize(appImportErrorLabel, 800, 22)
-        ac.setFontAlignment(appImportErrorLabel, 'center')
-
-        appImportErrorLabel2 = ac.addLabel(appWindow, 'You can look in "Documents/Assetto Corsa/logs/py_log.txt", search for "TheSetupMarket logs"')
-        ac.setPosition(appImportErrorLabel2, 0, 150)
-        ac.setSize(appImportErrorLabel2, 800, 22)
-        ac.setFontAlignment(appImportErrorLabel2, 'center')
-
-        appImportErrorLabel3 = ac.addLabel(appWindow, 'and post the results in The Setup Market App thread on the AC forums, section apps.')
-        ac.setPosition(appImportErrorLabel3, 0, 172)
-        ac.setSize(appImportErrorLabel3, 800, 22)
-        ac.setFontAlignment(appImportErrorLabel3, 'center')
-
-        appImportErrorLabel4 = ac.addLabel(appWindow, 'Sorry for the inconvenience.')
-        ac.setPosition(appImportErrorLabel4, 0, 232)
-        ac.setSize(appImportErrorLabel4, 800, 22)
-        ac.setFontAlignment(appImportErrorLabel4, 'center')
-    elif state=='SERVER_DOWN':
-        appImportErrorLabel = ac.addLabel(appWindow, 'The server is down, sorry for the inconvenience.')
-        ac.setPosition(appImportErrorLabel, 0, 172)
-        ac.setSize(appImportErrorLabel, 800, 22)
-        ac.setFontAlignment(appImportErrorLabel, 'center')
-
-
-def initGUI(appWindow):
-    global section1Title, section2Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType
 
     ###################################
     ### Download section            ###
