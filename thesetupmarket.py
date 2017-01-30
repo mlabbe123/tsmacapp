@@ -544,6 +544,7 @@ def initGUI(appWindow):
 
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
+    ac.setVisible(listingTableSetupTypeButton, 0)
     ac.setCustomFont(listingTableSetupTypeButton, "OpenSans", 0, 1)
     ac.setFontSize(listingTableSetupTypeButton, GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setPosition(listingTableSetupTypeButton, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 115)
@@ -1065,6 +1066,7 @@ def updateSetupsListingTable(setups):
                ac.setVisible(labelCtrl, 0)
 
     ac.setVisible(refreshSetupsButton, 1)
+    ac.setVisible(listingTableSetupTypeButton, 1)
 
 
 ##################################
@@ -1331,6 +1333,8 @@ def onUpdateListingTablePageSpinnerClick(x):
 def onListingTableSetupTypeButtonClick(*args):
     global activeSetupType
 
+    ac.setVisible(listingTableSetupTypeButton, 0)
+
     if activeSetupType == 'trackSpecific':
         activeSetupType = 'anyTracks'
         updateSetupsListingTable(setups['anyTracks'][:5])
@@ -1443,6 +1447,7 @@ def onRefreshSetupsButtonClick(*args):
 
     # Hide setups listing refresh button
     ac.setVisible(refreshSetupsButton, 0)
+    ac.setVisible(listingTableSetupTypeButton, 0)
 
     # Hide setups listing table
     hideSetupsListingTable()
