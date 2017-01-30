@@ -80,14 +80,12 @@ def acMain(ac_version):
     ac.initFont(0, "OpenSans", 1, 1)
 
     appWindow = ac.newApp("The Setup Market")
-    ac.setSize(appWindow, 1200, 420)
+    ac.setSize(appWindow, 1110, 420)
 
     if importError:
         ac.log('TheSetupMarket logs | errors in imports')
         initAppWithError()
         return "The Setup Market"
-
-    checkIfServerDown()
 
     # Get current c\/track/layout.
     currentCarName = ac.getCarName(0)
@@ -97,6 +95,8 @@ def acMain(ac_version):
     activeSetupType = 'trackSpecific'
 
     initAppWithLoadingState()
+
+    checkIfServerDown()
 
 
 def initUploadSection():
@@ -175,27 +175,27 @@ def initAppWithError(state='IMPORT_ERROR'):
     if state=='IMPORT_ERROR':
         appImportErrorLabel = ac.addLabel(appWindow, 'There has been an error loading the app.')
         ac.setPosition(appImportErrorLabel, 0, 90)
-        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setSize(appImportErrorLabel, 1110, 22)
         ac.setFontAlignment(appImportErrorLabel, 'center')
 
         appImportErrorLabel2 = ac.addLabel(appWindow, 'You can look in "Documents/Assetto Corsa/logs/py_log.txt", search for "TheSetupMarket logs"')
         ac.setPosition(appImportErrorLabel2, 0, 150)
-        ac.setSize(appImportErrorLabel2, 800, 22)
+        ac.setSize(appImportErrorLabel2, 1110, 22)
         ac.setFontAlignment(appImportErrorLabel2, 'center')
 
         appImportErrorLabel3 = ac.addLabel(appWindow, 'and post the results in The Setup Market App thread on the AC forums, section apps.')
         ac.setPosition(appImportErrorLabel3, 0, 172)
-        ac.setSize(appImportErrorLabel3, 800, 22)
+        ac.setSize(appImportErrorLabel3, 1110, 22)
         ac.setFontAlignment(appImportErrorLabel3, 'center')
 
         appImportErrorLabel4 = ac.addLabel(appWindow, 'Sorry for the inconvenience.')
         ac.setPosition(appImportErrorLabel4, 0, 232)
-        ac.setSize(appImportErrorLabel4, 800, 22)
+        ac.setSize(appImportErrorLabel4, 1110, 22)
         ac.setFontAlignment(appImportErrorLabel4, 'center')
     elif state=='SERVER_DOWN':
         appImportErrorLabel = ac.addLabel(appWindow, 'The server is down, sorry for the inconvenience.')
         ac.setPosition(appImportErrorLabel, 0, 172)
-        ac.setSize(appImportErrorLabel, 800, 22)
+        ac.setSize(appImportErrorLabel, 1110, 22)
         ac.setFontAlignment(appImportErrorLabel, 'center')
 
 
@@ -204,11 +204,11 @@ def initAppWithLoadingState():
 
     fetchingServerLabel = ac.addLabel(appWindow, 'Fetching server...')
     ac.setPosition(fetchingServerLabel, 0, 172)
-    ac.setSize(fetchingServerLabel, 800, 22)
+    ac.setSize(fetchingServerLabel, 1110, 22)
     ac.setFontAlignment(fetchingServerLabel, 'center')
 
 def initGUI(appWindow):
-    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, activeSetupType, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
+    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, refreshSetupsButton, activeSetupType, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
@@ -266,7 +266,8 @@ def initGUI(appWindow):
             'rating_cell': ac.addLabel(appWindow, ''),
             'downloads_cell': ac.addLabel(appWindow, ''),
             'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
+            'version_cell': ac.addLabel(appWindow, ''),
+            'filename_cell': ac.addLabel(appWindow, '')
         }),
         (2, {
             'dl_cell': ac.addLabel(appWindow, ''),
@@ -278,7 +279,8 @@ def initGUI(appWindow):
             'rating_cell': ac.addLabel(appWindow, ''),
             'downloads_cell': ac.addLabel(appWindow, ''),
             'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
+            'version_cell': ac.addLabel(appWindow, ''),
+            'filename_cell': ac.addLabel(appWindow, '')
         }),
         (3, {
             'dl_cell': ac.addLabel(appWindow, ''),
@@ -290,7 +292,8 @@ def initGUI(appWindow):
             'rating_cell': ac.addLabel(appWindow, ''),
             'downloads_cell': ac.addLabel(appWindow, ''),
             'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
+            'version_cell': ac.addLabel(appWindow, ''),
+            'filename_cell': ac.addLabel(appWindow, '')
         }),
         (4, {
             'dl_cell': ac.addLabel(appWindow, ''),
@@ -302,7 +305,8 @@ def initGUI(appWindow):
             'rating_cell': ac.addLabel(appWindow, ''),
             'downloads_cell': ac.addLabel(appWindow, ''),
             'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
+            'version_cell': ac.addLabel(appWindow, ''),
+            'filename_cell': ac.addLabel(appWindow, '')
         }),
         (5, {
             'dl_cell': ac.addLabel(appWindow, ''),
@@ -314,7 +318,8 @@ def initGUI(appWindow):
             'rating_cell': ac.addLabel(appWindow, ''),
             'downloads_cell': ac.addLabel(appWindow, ''),
             'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
+            'version_cell': ac.addLabel(appWindow, ''),
+            'filename_cell': ac.addLabel(appWindow, '')
         })
     ])
 
@@ -425,10 +430,12 @@ def initGUI(appWindow):
 
     # Setting up the refresh setups button
     refreshSetupsButton = ac.addButton(appWindow, '')
-    ac.setPosition(refreshSetupsButton, 725, 30)
-    ac.setSize(refreshSetupsButton, 70, 20)
+    ac.setVisible(refreshSetupsButton, 0)
+    ac.setCustomFont(refreshSetupsButton, "OpenSans", 0, 1)
+    ac.setFontSize(refreshSetupsButton, GUIConfig.GUIConstants['fontSizes']['button'])
+    ac.setPosition(refreshSetupsButton, 1033, 29)
+    ac.setSize(refreshSetupsButton, 70, 22)
     ac.setText(refreshSetupsButton, 'Refresh')
-    ac.setVisible(refreshSetupsButton, 1)
     ac.setBackgroundColor(refreshSetupsButton, 1, 1, 1)
     ac.setFontColor(refreshSetupsButton, 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(refreshSetupsButton, 1)
@@ -437,14 +444,15 @@ def initGUI(appWindow):
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
-    addTableCell('Track', 250, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 90, 53, 'center', False)
-    addTableCell('Author', 185, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 335, 53, 'center', False)
-    addTableCell('Trim', 50, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 520, 53, 'center', False)
-    addTableCell('Best Time', 90, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 570, 53, 'center', False)
-    addTableCell('Rating', 70, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 655, 53, 'center', False)
-    addTableCell('Dl', 40, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 725, 53, 'center', False)
-    addTableCell('AC', 30, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 765, 53, 'center', False)
-    addTableCell('Version', 60, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 795, 53, 'center', False)
+    addTableCell('Track', 244, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 90, 53, 'center', False)
+    addTableCell('Author', 184, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 335, 53, 'center', False)
+    addTableCell('Trim', 49, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 520, 53, 'center', False)
+    addTableCell('Best Time', 84, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 570, 53, 'center', False)
+    addTableCell('Rating', 69, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 655, 53, 'center', False)
+    addTableCell('Dl', 39, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 725, 53, 'center', False)
+    addTableCell('AC', 29, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 765, 53, 'center', False)
+    addTableCell('Version', 59, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 795, 53, 'center', False)
+    addTableCell('File name', 248, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 855, 53, 'center', False)
 
     # Init the setups listing table with empty labels
     yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
@@ -497,7 +505,7 @@ def initGUI(appWindow):
 
         ac.setText(labelCtrl, labelText)
         ac.setPosition(labelCtrl, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
-        ac.setSize(labelCtrl, 780, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
+        ac.setSize(labelCtrl, 1110, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
         ac.drawBorder(labelCtrl, 0)
         ac.setVisible(labelCtrl, 0)
         ac.setFontAlignment(labelCtrl, 'center')
@@ -536,6 +544,8 @@ def initGUI(appWindow):
 
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
+    ac.setCustomFont(listingTableSetupTypeButton, "OpenSans", 0, 1)
+    ac.setFontSize(listingTableSetupTypeButton, GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setPosition(listingTableSetupTypeButton, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 115)
     ac.setSize(listingTableSetupTypeButton, 140, 22)
     ac.setText(listingTableSetupTypeButton, 'Current Track')
@@ -554,7 +564,7 @@ def initGUI(appWindow):
 
     # SEPARATOR
     separator = ac.addLabel(appWindow, '')
-    ac.setSize(separator, 800, 2)
+    ac.setSize(separator, 1110, 2)
     ac.setBackgroundColor(separator, 1, 1, 1)
     ac.setBackgroundOpacity(separator, 1)
     ac.drawBackground(separator, 1)
@@ -567,7 +577,9 @@ def initGUI(appWindow):
     # ac.setPosition(section4Title, 10, 235)
 
     # Add reset upload section button
-    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 720, 226)
+    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 1033, 226)
+    ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
     ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
     ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
@@ -637,7 +649,7 @@ def initUploadSectionGUI():
 
     # Configure the error message label
     ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 275)
-    ac.setSize(uploadSectionElements['uploadMessageLabel'], 800, 22)
+    ac.setSize(uploadSectionElements['uploadMessageLabel'], 1100, 22)
     ac.setFontAlignment(uploadSectionElements['uploadMessageLabel'], 'center')
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
 
@@ -708,7 +720,7 @@ def initUploadSectionGUI():
 
     # Configure the update setup message label
     ac.setPosition(updateSectionElements['updateMessageLabel'], 0, 300)
-    ac.setSize(updateSectionElements['updateMessageLabel'], 800, 22)
+    ac.setSize(updateSectionElements['updateMessageLabel'], 1100, 22)
     ac.setFontAlignment(updateSectionElements['updateMessageLabel'], 'center')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 0)
 
@@ -839,7 +851,7 @@ def initUploadSectionGUI():
         rowNumber += 1
 
     ac.setPosition(listingUpdateTableMisc['emptyRowLabel']['label'], 5, 315)
-    ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 590, 22)
+    ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 1100, 22)
     ac.setFontAlignment(listingUpdateTableMisc['emptyRowLabel']['label'], 'center')
 
     ac.setPosition(updateSectionElements['updateOptionsMessageLabel'], 595, 290)
@@ -953,7 +965,10 @@ def refreshSetupsListingTable():
     else:
         ac.log('TheSetupMarket logs | refreshSetupsListingTable - no setups')
         ac.setVisible(listingTableMisc['emptyRowLabel']['label'], 1)
+        ac.log('TheSetupMarket logs | refreshSetupsListingTable - before hideSetupsListingTable')
         hideSetupsListingTable()
+        ac.log('TheSetupMarket logs | refreshSetupsListingTable - before updateSetupsListingTable')
+
         updateSetupsListingTable(setups[activeSetupType])
 
 
@@ -994,6 +1009,7 @@ def updateSetupsListingTable(setups):
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
             if cellName == 'rate_cell':
                 ac.setBackgroundColor(labelCtrl,1,1,1)
+                ac.setFontColor(labelCtrl, 0.25098, 0.66274, 0.66274, 1)
                 ac.setText(labelCtrl, 'Rate')
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
@@ -1037,6 +1053,8 @@ def updateSetupsListingTable(setups):
                 ac.setText(labelCtrl, str(setup['sim_version']))
             elif cellName == 'version_cell':
                 ac.setText(labelCtrl, 'v'+str(setup['version']))
+            elif cellName == 'filename_cell':
+                ac.setText(labelCtrl, str(setup['file_name']))
 
         rowNumber += 1
 
@@ -1045,6 +1063,8 @@ def updateSetupsListingTable(setups):
         for index in range(GUIConfig.GUIConstants['setupsPerPage'] - len(setups)):
            for cellName, labelCtrl in listingTable[GUIConfig.GUIConstants['setupsPerPage'] - index].items():
                ac.setVisible(labelCtrl, 0)
+
+    ac.setVisible(refreshSetupsButton, 1)
 
 
 ##################################
@@ -1420,6 +1440,9 @@ def onRateButton5Clicked(*args):
 @async
 def onRefreshSetupsButtonClick(*args):
     global setups
+
+    # Hide setups listing refresh button
+    ac.setVisible(refreshSetupsButton, 0)
 
     # Hide setups listing table
     hideSetupsListingTable()

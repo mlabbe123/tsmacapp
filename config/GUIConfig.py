@@ -22,7 +22,7 @@ GUIConstants = {
         'cellHeight': 21,
         'xPos': {
             'dl_cell': 5,
-            'rate_cell': 30,
+            'rate_cell': 31,
             'track_cell': 90,
             'author_cell': 335,
             'trim_cell': 520,
@@ -30,11 +30,12 @@ GUIConstants = {
             'rating_cell': 655,
             'downloads_cell': 725,
             'acversion_cell': 765,
-            'version_cell': 795
+            'version_cell': 795,
+            'filename_cell': 855
         },
         'cellXSize': {
             'dl_cell': 25,
-            'rate_cell': 60,
+            'rate_cell': 58,
             'track_cell': 250,
             'author_cell': 185,
             'trim_cell': 50,
@@ -42,7 +43,8 @@ GUIConstants = {
             'rating_cell': 70,
             'downloads_cell': 40,
             'acversion_cell': 30,
-            'version_cell': 60
+            'version_cell': 60,
+            'filename_cell': 248
         },
         'startingYPosition': 75
     },
@@ -65,5 +67,8 @@ GUIConstants = {
             'version_cell': 60
         },
         'startingYPosition': 277
+    },
+    'fontSizes': {
+        'button': 16
     }
 }
