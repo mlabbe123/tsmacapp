@@ -556,6 +556,7 @@ def initGUI(appWindow):
     ac.setPosition(listingTableMisc['ratingDialogSendButton']['label'], 480,
                    GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
                        'cellHeight'] * 4.7)
+    ac.addOnClickedListener(listingTableMisc['ratingDialogSendButton']['label'], onSendRatingClick)
 
     ac.setSize(listingTableMisc['ratingDialogCancelButton']['label'], 60, 22)
     ac.setBackgroundOpacity(listingTableMisc['ratingDialogCancelButton']['label'], 0)
@@ -1469,6 +1470,13 @@ def onRateButton5Clicked(*args):
 def onCancelRatingClick(*args):
     closeRatingDialog()
 
+def onSendRatingClick(*args):
+    ac.log('TheSetupMarket logs | onSendRatingClick | userSteamId: '+str(userSteamId)+' | setupId: '+str(currentSetupIdForRating)+' | rating: '+str(currentRatingToSend))
+
+    # Send rating to TSM API.
+
+    closeRatingDialog()
+
 
 def on1RatingClick(*args):
     setRatingStarsColor(1)
@@ -1497,6 +1505,10 @@ def on5RatingClick(*args):
 
 
 def openRatingDialog(setupId):
+    global currentSetupIdForRating
+
+    currentSetupIdForRating = setupId
+
     ac.log('TheSetupMarket logs | opened rating dialong for setupId: '+str(setupId))
     hideSetupsListingTable()
 
@@ -1516,8 +1528,9 @@ def openRatingDialog(setupId):
     ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 1)
     ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
 
-
     # set the send button click event.
+
+
 
 def closeRatingDialog():
     # Show the rating dialog
@@ -1534,6 +1547,10 @@ def closeRatingDialog():
 
 
 def setRatingStarsColor(rating):
+    global currentRatingToSend
+
+    currentRatingToSend = rating
+
     if rating == 0:
         ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 1, 1, 1, 1)
         ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 1, 1, 1, 1)
