@@ -245,11 +245,11 @@ def initGUI(appWindow):
             'text': u'\u2605'
         },
         'ratingDialogSendButton': {
-            'label': ac.addLabel(appWindow, ''),
+            'label': ac.addButton(appWindow, ''),
             'text': 'Send'
         },
         'ratingDialogCancelButton': {
-            'label': ac.addLabel(appWindow, ''),
+            'label': ac.addButton(appWindow, ''),
             'text': 'Cancel'
         }
     }
@@ -483,6 +483,8 @@ def initGUI(appWindow):
                 elif rowNumber == 5:
                     ac.addOnClickedListener(label, onDownloadButton5Clicked)
             elif cellId == 'rate_cell':
+                ac.setBackgroundColor(label, 1, 1, 1)
+
                 if rowNumber == 1:
                     ac.addOnClickedListener(label, onRateButton1Clicked)
                 elif rowNumber == 2:
@@ -514,33 +516,54 @@ def initGUI(appWindow):
     ac.setPosition(listingTableMisc['ratingDialogTitle']['label'], 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] / 2)
 
     ac.setSize(listingTableMisc['ratingDialog1Star']['label'], 50, 50)
-    ac.setPosition(listingTableMisc['ratingDialog1Star']['label'], 400, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 1.5)
+    ac.setFontSize(listingTableMisc['ratingDialog1Star']['label'], 40)
+    ac.setPosition(listingTableMisc['ratingDialog1Star']['label'], 435,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 1.5)
+    ac.addOnClickedListener(listingTableMisc['ratingDialog1Star']['label'], on1RatingClick)
 
     ac.setSize(listingTableMisc['ratingDialog2Star']['label'], 50, 50)
-    ac.setPosition(listingTableMisc['ratingDialog2Star']['label'], 450, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 1.5)
+    ac.setFontSize(listingTableMisc['ratingDialog2Star']['label'], 40)
+    ac.setPosition(listingTableMisc['ratingDialog2Star']['label'], 485,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 1.5)
+    ac.addOnClickedListener(listingTableMisc['ratingDialog2Star']['label'], on2RatingClick)
 
     ac.setSize(listingTableMisc['ratingDialog3Star']['label'], 50, 50)
-    ac.setPosition(listingTableMisc['ratingDialog3Star']['label'], 500,
+    ac.setFontSize(listingTableMisc['ratingDialog3Star']['label'], 40)
+    ac.setPosition(listingTableMisc['ratingDialog3Star']['label'], 535,
                    GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
                        'cellHeight'] * 1.5)
+    ac.addOnClickedListener(listingTableMisc['ratingDialog3Star']['label'], on3RatingClick)
 
     ac.setSize(listingTableMisc['ratingDialog4Star']['label'], 50, 50)
-    ac.setPosition(listingTableMisc['ratingDialog4Star']['label'], 550,
+    ac.setFontSize(listingTableMisc['ratingDialog4Star']['label'], 40)
+    ac.setPosition(listingTableMisc['ratingDialog4Star']['label'], 585,
                    GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
                        'cellHeight'] * 1.5)
+    ac.addOnClickedListener(listingTableMisc['ratingDialog4Star']['label'], on4RatingClick)
 
     ac.setSize(listingTableMisc['ratingDialog5Star']['label'], 50, 50)
-    ac.setPosition(listingTableMisc['ratingDialog5Star']['label'], 600,
+    ac.setFontSize(listingTableMisc['ratingDialog5Star']['label'], 40)
+    ac.setPosition(listingTableMisc['ratingDialog5Star']['label'], 635,
                    GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
                        'cellHeight'] * 1.5)
+    ac.addOnClickedListener(listingTableMisc['ratingDialog5Star']['label'], on5RatingClick)
 
-    ac.setSize(listingTableMisc['ratingDialogSendButton']['label'], 50, 100)
-    ac.setPosition(listingTableMisc['ratingDialogSendButton']['label'], 400, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 3)
-
-    ac.setSize(listingTableMisc['ratingDialogCancelButton']['label'], 50, 100)
-    ac.setPosition(listingTableMisc['ratingDialogCancelButton']['label'], 500,
+    ac.setSize(listingTableMisc['ratingDialogSendButton']['label'], 60, 22)
+    ac.setBackgroundOpacity(listingTableMisc['ratingDialogSendButton']['label'], 0)
+    ac.drawBorder(listingTableMisc['ratingDialogSendButton']['label'], 1)
+    ac.setPosition(listingTableMisc['ratingDialogSendButton']['label'], 480,
                    GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
-                       'cellHeight'] * 3)
+                       'cellHeight'] * 4.7)
+
+    ac.setSize(listingTableMisc['ratingDialogCancelButton']['label'], 60, 22)
+    ac.setBackgroundOpacity(listingTableMisc['ratingDialogCancelButton']['label'], 0)
+    ac.drawBorder(listingTableMisc['ratingDialogCancelButton']['label'], 1)
+    ac.setPosition(listingTableMisc['ratingDialogCancelButton']['label'], 585,
+                   GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout'][
+                       'cellHeight'] * 4.7)
+    ac.addOnClickedListener(listingTableMisc['ratingDialogCancelButton']['label'], onCancelRatingClick)
 
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
@@ -559,7 +582,7 @@ def initGUI(appWindow):
 
     # Setting up the setups listing table page spinner
     listingTablePageSpinner = ac.addSpinner(appWindow, '')
-    ac.setPosition(listingTablePageSpinner, 735, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 114)
+    ac.setPosition(listingTablePageSpinner, 1043, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 112)
     ac.setSize(listingTablePageSpinner, 60, 20)
     ac.setVisible(listingTablePageSpinner, 0)
 
@@ -1413,32 +1436,140 @@ def onDownloadButton5Clicked(*args):
 
 
 def onRateButton1Clicked(*args):
-    ac.log('TheSetupMarket logs | rate button1 clicked')
     if eventInfos['setupIds'][0] != '':
-        hideSetupsListingTable()
+        ac.log('TheSetupMarket logs | rate button1 clicked' + str(eventInfos['setupIds'][0]))
 
-        # Show the rating dialog
-        ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialog1Star']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialog2Star']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialog3Star']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialog4Star']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialog5Star']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 1)
-        ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
-
+        openRatingDialog(eventInfos['setupIds'][0])
 
 def onRateButton2Clicked(*args):
-    ac.log('TheSetupMarket logs | rate button2 clicked')
+    if eventInfos['setupIds'][1] != '':
+        ac.log('TheSetupMarket logs | rate button2 clicked' + str(eventInfos['setupIds'][1]))
+
+        openRatingDialog(eventInfos['setupIds'][1])
 
 def onRateButton3Clicked(*args):
-    ac.log('TheSetupMarket logs | rate button3 clicked')
+    if eventInfos['setupIds'][2] != '':
+        ac.log('TheSetupMarket logs | rate button3 clicked' + str(eventInfos['setupIds'][2]))
+
+        openRatingDialog(eventInfos['setupIds'][2])
 
 def onRateButton4Clicked(*args):
-    ac.log('TheSetupMarket logs | rate button4 clicked')
+    if eventInfos['setupIds'][3] != '':
+        ac.log('TheSetupMarket logs | rate button4 clicked' + str(eventInfos['setupIds'][3]))
+
+        openRatingDialog(eventInfos['setupIds'][3])
 
 def onRateButton5Clicked(*args):
-    ac.log('TheSetupMarket logs | rate button5 clicked')
+    if eventInfos['setupIds'][4] != '':
+        ac.log('TheSetupMarket logs | rate button5 clicked' + str(eventInfos['setupIds'][4]))
+
+        openRatingDialog(eventInfos['setupIds'][4])
+
+
+def onCancelRatingClick(*args):
+    closeRatingDialog()
+
+
+def on1RatingClick(*args):
+    setRatingStarsColor(1)
+
+    # set global ratingToSend var to 1
+
+def on2RatingClick(*args):
+    setRatingStarsColor(2)
+
+    # set global ratingToSend var to 2
+
+def on3RatingClick(*args):
+    setRatingStarsColor(3)
+
+    # set global ratingToSend var to 3
+
+def on4RatingClick(*args):
+    setRatingStarsColor(4)
+
+    # set global ratingToSend var to 4
+
+def on5RatingClick(*args):
+    setRatingStarsColor(5)
+
+    # set global ratingToSend var to 5
+
+
+def openRatingDialog(setupId):
+    ac.log('TheSetupMarket logs | opened rating dialong for setupId: '+str(setupId))
+    hideSetupsListingTable()
+
+    ac.setVisible(listingTableSetupTypeButton, 0)
+    ac.setVisible(refreshSetupsButton, 0)
+
+    # Get the user rating for that setup and color appropriately the stars (if already rated)
+    setRatingStarsColor(0) #set to 0 for now
+
+    # Show the rating dialog
+    ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialog1Star']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialog2Star']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialog3Star']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialog4Star']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialog5Star']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 1)
+    ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
+
+
+    # set the send button click event.
+
+def closeRatingDialog():
+    # Show the rating dialog
+    ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialog1Star']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialog2Star']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialog3Star']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialog4Star']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialog5Star']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 0)
+    ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 0)
+
+    refreshSetupsListingTable()
+
+
+def setRatingStarsColor(rating):
+    if rating == 0:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 1, 1, 1, 1)
+    elif rating == 1:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 1, 1, 1, 1)
+    elif rating == 2:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 1, 1, 1, 1)
+    elif rating == 3:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 1, 1, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 1, 1, 1, 1)
+    elif rating == 4:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 1, 1, 1, 1)
+    elif rating == 5:
+        ac.setFontColor(listingTableMisc['ratingDialog1Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog2Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog3Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog4Star']['label'], 0.5, 0.5, 1, 1)
+        ac.setFontColor(listingTableMisc['ratingDialog5Star']['label'], 0.5, 0.5, 1, 1)
 
 
 @async
