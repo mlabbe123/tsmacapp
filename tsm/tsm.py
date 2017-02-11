@@ -272,6 +272,23 @@ def updateSetup(car_ac_code, track_baseName, file_name, setup_id, car_id, track_
     callback(returnMessage)
 
 
+@async
+def sendSetupRating(userSteamId, setupId, userRating):
+    url = 'http://thesetupmarket.com/api/update-setup-rating-from-app/'
+
+    try:
+        r = requests.post(url, data={'userSteamId': userSteamId, 'userRating': userRating, 'setupId': setupId})
+    except requests.exceptions.RequestException as e:
+        ac.log('TheSetupMarket logs | sendSetupRating error request!: ' + str(e))
+
+    if r.status_code == 200:
+        ac.log('TheSetupMarket logs | sendSetupRating request success! Status code: ' + str(r.status_code))
+    else:
+        ac.log('TheSetupMarket logs | sendSetupRating request failed! Status code: ' + str(r.status_code))
+        ac.log('TheSetupMarket logs | sendSetupRating request failed! text: ' + str(r.text))
+        ac.log('TheSetupMarket logs | sendSetupRating request failed! content: ' + str(r.content))
+
+
 #######################################
 # Utilitary functions
 #######################################

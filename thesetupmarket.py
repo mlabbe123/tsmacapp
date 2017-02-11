@@ -1058,15 +1058,13 @@ def updateSetupsListingTable(setups):
                 if totalRating == 0:
                     ac.setText(labelCtrl, 'n/a')
                 else:
-                    if totalRating <= 1:
+                    if totalRating >= 1 and totalRating < 2:
                         ac.setText(labelCtrl, u'\u2605')
-                    elif totalRating > 1 and totalRating <= 2:
-                        ac.setText(labelCtrl, u'\u2605')
-                    elif totalRating > 2 and totalRating <= 3:
+                    elif totalRating >= 2 and totalRating < 3:
                         ac.setText(labelCtrl, u'\u2605'u'\u2605')
-                    elif totalRating > 3 and totalRating <= 4:
+                    elif totalRating >= 3 and totalRating < 4:
                         ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605')
-                    elif totalRating > 4 and totalRating < 5:
+                    elif totalRating >= 4 and totalRating < 5:
                         ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605'u'\u2605')
                     elif totalRating == 5:
                         ac.setText(labelCtrl, u'\u2605'u'\u2605'u'\u2605'u'\u2605'u'\u2605')
@@ -1474,6 +1472,7 @@ def onSendRatingClick(*args):
     ac.log('TheSetupMarket logs | onSendRatingClick | userSteamId: '+str(userSteamId)+' | setupId: '+str(currentSetupIdForRating)+' | rating: '+str(currentRatingToSend))
 
     # Send rating to TSM API.
+    tsm.sendSetupRating(userSteamId, currentSetupIdForRating, currentRatingToSend)
 
     closeRatingDialog()
 
@@ -1529,7 +1528,6 @@ def openRatingDialog(setupId):
     ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
 
     # set the send button click event.
-
 
 
 def closeRatingDialog():
