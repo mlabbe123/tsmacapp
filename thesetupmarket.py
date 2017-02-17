@@ -83,6 +83,7 @@ def acMain(ac_version):
     ac.initFont(0, "OpenSans", 1, 1)
 
     appWindow = ac.newApp("The Setup Market")
+    ac.setTitle(appWindow, "")
     ac.setSize(appWindow, 1110, 420)
 
     if importError:
@@ -211,7 +212,7 @@ def initAppWithLoadingState():
     ac.setFontAlignment(fetchingServerLabel, 'center')
 
 def initGUI(appWindow):
-    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, refreshSetupsButton, activeSetupType
+    global listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, refreshSetupsButton, activeSetupType
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
@@ -331,11 +332,11 @@ def initGUI(appWindow):
     ###################################
 
     ### Current track section ###
-    section1Title = ac.addLabel(appWindow, "Download")
+    appTitle = ac.addLabel(appWindow, "The Setup Market | 0.6")
     #ac.setCustomFont(<CONTROL_IDENTIFIER>,<FONTNAME>,<ITALIC>,<BOLD>)
-    ac.setCustomFont(section1Title, "OpenSans", 0, 0)
-    ac.setFontSize(section1Title, 20)
-    ac.setPosition(section1Title, 30, 25)
+    ac.setCustomFont(appTitle, "OpenSans", 0, 0)
+    ac.setFontSize(appTitle, 15)
+    ac.setPosition(appTitle, 50, 5)
 
     # Setting up the refresh setups button
     refreshSetupsButton = ac.addButton(appWindow, '')
@@ -379,6 +380,8 @@ def initGUI(appWindow):
             ac.drawBorder(label, 0)
             ac.setVisible(label, 0)
             ac.setFontAlignment(label, 'center')
+            ac.setCustomFont(label, "OpenSans", 0, 0)
+            ac.setFontSize(label, 15)
 
             if cellId == 'dl_cell':
                 if rowNumber == 1:
@@ -420,6 +423,8 @@ def initGUI(appWindow):
             ac.setVisible(labelCtrl, 0)
 
         ac.setText(labelCtrl, labelText)
+        ac.setCustomFont(labelCtrl, "OpenSans", 0, 0)
+        ac.setFontSize(labelCtrl, 15)
         ac.setPosition(labelCtrl, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
         ac.setSize(labelCtrl, 1110, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
         ac.drawBorder(labelCtrl, 0)
@@ -1059,15 +1064,17 @@ def updateSetupsListingTable(setups):
 
                 ac.setText(labelCtrl, bestlap)
             elif cellName == 'rating_cell':
-                totalRating = 0
+                if len(setup['ratings']) == 0:
+                    totalRating = None
+                else:
+                    totalRating = 0
+                    for rating in setup['ratings']:
+                        totalRating += rating['rating']
 
-                for rating in setup['ratings']:
-                    totalRating += rating['rating']
-
-                if totalRating == 0:
+                if totalRating == None:
                     ac.setText(labelCtrl, 'n/a')
                 else:
-                    if totalRating >= 1 and totalRating < 2:
+                    if totalRating >= 0 and totalRating < 2:
                         ac.setText(labelCtrl, u'\u2605')
                     elif totalRating >= 2 and totalRating < 3:
                         ac.setText(labelCtrl, u'\u2605'u'\u2605')
@@ -1957,6 +1964,8 @@ def addTableCell(text, sizeX, r, g, b, posX, posY, textAlign, element):
     ac.setBackgroundOpacity(cell, 1)
     ac.drawBackground(cell, 1)
     ac.drawBorder(cell, 0)
+    ac.setCustomFont(cell, "OpenSans", 0, 1)
+    ac.setFontSize(cell, 15)
     ac.setVisible(cell, 1)
 
     ac.setPosition(cell, posX, posY)
