@@ -48,6 +48,8 @@ def async(func):
         return t
     return wrapper
 
+TSMAppVersion = "0.6"
+
 
 @async
 def checkIfServerDown():
@@ -60,6 +62,7 @@ def checkIfServerDown():
     else:
         ac.log('TheSetupMarket logs | Server is up!')
         ac.setVisible(fetchingServerLabel, 0)
+        ac.setVisible()
 
         # Set the base GUI
         initGUI(appWindow)
@@ -208,7 +211,7 @@ def initAppWithLoadingState():
     ac.setFontAlignment(fetchingServerLabel, 'center')
 
 def initGUI(appWindow):
-    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, refreshSetupsButton, activeSetupType, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements, uploadSectionElements, updateSectionElements, currentUploadTrim, currentUploadBaseline, userSetupListingTable
+    global section1Title, listingTable, listingTableMisc, listingTablePageSpinner, listingTableSetupTypeButton, refreshSetupsButton, activeSetupType
 
     # Initialize the listing tables empty and loading labels.
     listingTableMisc = {
@@ -323,100 +326,6 @@ def initGUI(appWindow):
         })
     ])
 
-    # Set the GUI elements for the general upload section
-    uploadSectionGeneralElements = {
-        'uploadTypeSwitcherButton': ac.addLabel(appWindow, ''),
-        'updateTypeSwitcherButton': ac.addLabel(appWindow, '')
-        # 'deleteTypeSwitcherButton': ac.addLabel(appWindow, '')
-    }
-
-    # Set the GUI elements for the upload NEW setup section
-    uploadSectionElements = {
-        'refreshUploadGUIButton': ac.addButton(appWindow, ''),
-        'fileSelectorButtonLabel': ac.addLabel(appWindow, ''),
-        'fileSelectorButton': ac.addButton(appWindow, ''),
-        'trimSelectorButtonLabel': ac.addLabel(appWindow, ''),
-        'trimSelectorButton': ac.addButton(appWindow, ''),
-        'baselineSelectorButtonLabel': ac.addLabel(appWindow, ''),
-        'baselineSelectorButton': ac.addButton(appWindow, ''),
-        'uploadButton': ac.addButton(appWindow, ''),
-        'uploadMessageLabel': ac.addLabel(appWindow, '')
-    }
-
-    # Set the GUI elements for the upload UPDATE existing setup section
-    updateSectionElements = {
-        'refreshUpdateGUIButton': ac.addButton(appWindow, ''),
-        'listingTableFilenameHeader': ac.addLabel(appWindow, ''),
-        'listingTableTrackHeader': ac.addLabel(appWindow, ''),
-        'listingTableTrimHeader': ac.addLabel(appWindow, ''),
-        'listingTableAcVersionHeader': ac.addLabel(appWindow, ''),
-        'listingTableSetupVersionHeader': ac.addLabel(appWindow, ''),
-        'fileSelectorButton': ac.addButton(appWindow, ''),
-        'trimSelectorRaceButton': ac.addButton(appWindow, ''),
-        'trimSelectorQualyButton': ac.addButton(appWindow, ''),
-        'trimSelectorBaseButton': ac.addButton(appWindow, ''),
-        'baselineSelectorButton': ac.addButton(appWindow, ''),
-        'uploadButton': ac.addButton(appWindow, ''),
-        'uploadMessageLabel': ac.addLabel(appWindow, ''),
-        'updateMessageLabel': ac.addLabel(appWindow, ''),
-        'updateOptionsMessageLabel': ac.addLabel(appWindow, 'Select a setup on the left.')
-    }
-
-    # Initialize the listing tables.
-    updateListingTable = OrderedDict([
-        (1, {
-            'select_cell': ac.addLabel(appWindow, ''),
-            'file_name_cell': ac.addLabel(appWindow, ''),
-            'track_cell': ac.addLabel(appWindow, ''),
-            'trim_cell': ac.addLabel(appWindow, ''),
-            'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
-        }),
-        (2, {
-            'select_cell': ac.addLabel(appWindow, ''),
-            'file_name_cell': ac.addLabel(appWindow, ''),
-            'track_cell': ac.addLabel(appWindow, ''),
-            'trim_cell': ac.addLabel(appWindow, ''),
-            'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
-        }),
-        (3, {
-            'select_cell': ac.addLabel(appWindow, ''),
-            'file_name_cell': ac.addLabel(appWindow, ''),
-            'track_cell': ac.addLabel(appWindow, ''),
-            'trim_cell': ac.addLabel(appWindow, ''),
-            'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
-        }),
-        (4, {
-            'select_cell': ac.addLabel(appWindow, ''),
-            'file_name_cell': ac.addLabel(appWindow, ''),
-            'track_cell': ac.addLabel(appWindow, ''),
-            'trim_cell': ac.addLabel(appWindow, ''),
-            'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
-        }),
-        (5, {
-            'select_cell': ac.addLabel(appWindow, ''),
-            'file_name_cell': ac.addLabel(appWindow, ''),
-            'track_cell': ac.addLabel(appWindow, ''),
-            'trim_cell': ac.addLabel(appWindow, ''),
-            'acversion_cell': ac.addLabel(appWindow, ''),
-            'version_cell': ac.addLabel(appWindow, '')
-        })
-    ])
-
-    listingUpdateTableMisc = {
-        'emptyRowLabel': {
-            'label': ac.addLabel(appWindow, ''),
-            'text': 'No setups for current car and track'
-        },
-        'loadingLabel': {
-            'label': ac.addLabel(appWindow, ''),
-            'text': 'Loading...'
-        }
-    }
-
     ###################################
     ### Download section            ###
     ###################################
@@ -505,11 +414,15 @@ def initGUI(appWindow):
         labelCtrl = labelConfig['label']
         labelText = labelConfig['text']
 
+        if labelName == 'loadingLabel':
+            ac.setVisible(labelCtrl, 1)
+        else:
+            ac.setVisible(labelCtrl, 0)
+
         ac.setText(labelCtrl, labelText)
         ac.setPosition(labelCtrl, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
         ac.setSize(labelCtrl, 1110, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
         ac.drawBorder(labelCtrl, 0)
-        ac.setVisible(labelCtrl, 0)
         ac.setFontAlignment(labelCtrl, 'center')
 
     # rating dialog items
@@ -601,25 +514,18 @@ def initGUI(appWindow):
     # section4Title = ac.addLabel(appWindow, "/Upload setup")
     # ac.setPosition(section4Title, 10, 235)
 
-    # Add reset upload section button
-    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 1033, 226)
-    ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
-    ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
-    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
-    ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
-    ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
-    ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 1)
-    ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
-    ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 0)
-    ac.addOnClickedListener(uploadSectionElements['refreshUploadGUIButton'], onRefreshUploadSectionButtonClick)
-    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
-
 
 def initUploadSectionGUI():
-    global updateListingTablePageSpinner
+    global updateListingTablePageSpinner, updateSectionElements, uploadSectionElements, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements
 
     ac.log('TheSetupMarket logs | initUploadSectionGUI: Init the upload section GUI')
+
+    # Set the GUI elements for the general upload section
+    uploadSectionGeneralElements = {
+        'uploadTypeSwitcherButton': ac.addLabel(appWindow, ''),
+        'updateTypeSwitcherButton': ac.addLabel(appWindow, '')
+        # 'deleteTypeSwitcherButton': ac.addLabel(appWindow, '')
+    }
 
     # Configure the button to switch to Upload
     ac.setPosition(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 336, 226)
@@ -671,6 +577,33 @@ def initUploadSectionGUI():
     ###################################
     ### Upload new section          ###
     ###################################
+
+    # Set the GUI elements for the upload NEW setup section
+    uploadSectionElements = {
+        'refreshUploadGUIButton': ac.addButton(appWindow, ''),
+        'fileSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'fileSelectorButton': ac.addButton(appWindow, ''),
+        'trimSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'trimSelectorButton': ac.addButton(appWindow, ''),
+        'baselineSelectorButtonLabel': ac.addLabel(appWindow, ''),
+        'baselineSelectorButton': ac.addButton(appWindow, ''),
+        'uploadButton': ac.addButton(appWindow, ''),
+        'uploadMessageLabel': ac.addLabel(appWindow, '')
+    }
+
+    # Add reset upload section button
+    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 1033, 226)
+    ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
+    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
+    ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
+    ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 1)
+    ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
+    ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 0)
+    ac.addOnClickedListener(uploadSectionElements['refreshUploadGUIButton'], onRefreshUploadSectionButtonClick)
 
     # Configure the error message label
     ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 275)
@@ -742,6 +675,25 @@ def initUploadSectionGUI():
     ###################################
     ### Update section              ###
     ###################################
+
+    # Set the GUI elements for the upload UPDATE existing setup section
+    updateSectionElements = {
+        'refreshUpdateGUIButton': ac.addButton(appWindow, ''),
+        'listingTableFilenameHeader': ac.addLabel(appWindow, ''),
+        'listingTableTrackHeader': ac.addLabel(appWindow, ''),
+        'listingTableTrimHeader': ac.addLabel(appWindow, ''),
+        'listingTableAcVersionHeader': ac.addLabel(appWindow, ''),
+        'listingTableSetupVersionHeader': ac.addLabel(appWindow, ''),
+        'fileSelectorButton': ac.addButton(appWindow, ''),
+        'trimSelectorRaceButton': ac.addButton(appWindow, ''),
+        'trimSelectorQualyButton': ac.addButton(appWindow, ''),
+        'trimSelectorBaseButton': ac.addButton(appWindow, ''),
+        'baselineSelectorButton': ac.addButton(appWindow, ''),
+        'uploadButton': ac.addButton(appWindow, ''),
+        'uploadMessageLabel': ac.addLabel(appWindow, ''),
+        'updateMessageLabel': ac.addLabel(appWindow, ''),
+        'updateOptionsMessageLabel': ac.addLabel(appWindow, 'Select a setup on the left.')
+    }
 
     # Configure the update setup message label
     ac.setPosition(updateSectionElements['updateMessageLabel'], 0, 300)
@@ -835,6 +787,50 @@ def initUploadSectionGUI():
     ac.addOnClickedListener(updateSectionElements['uploadButton'], onUpdateUploadButtonClick)
     ac.setVisible(updateSectionElements['uploadButton'], 0)
 
+    # Initialize the listing tables.
+    updateListingTable = OrderedDict([
+        (1, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (2, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (3, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (4, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        }),
+        (5, {
+            'select_cell': ac.addLabel(appWindow, ''),
+            'file_name_cell': ac.addLabel(appWindow, ''),
+            'track_cell': ac.addLabel(appWindow, ''),
+            'trim_cell': ac.addLabel(appWindow, ''),
+            'acversion_cell': ac.addLabel(appWindow, ''),
+            'version_cell': ac.addLabel(appWindow, '')
+        })
+    ])
+
     yPos = GUIConfig.GUIConstants['updateTableLayout']['startingYPosition']
     rowNumber = 1
 
@@ -874,6 +870,17 @@ def initUploadSectionGUI():
 
         yPos += GUIConfig.GUIConstants['updateTableLayout']['cellHeight'] + 1
         rowNumber += 1
+
+    listingUpdateTableMisc = {
+        'emptyRowLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'No setups for current car and track'
+        },
+        'loadingLabel': {
+            'label': ac.addLabel(appWindow, ''),
+            'text': 'Loading...'
+        }
+    }
 
     ac.setPosition(listingUpdateTableMisc['emptyRowLabel']['label'], 5, 315)
     ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 1100, 22)
@@ -999,6 +1006,8 @@ def refreshSetupsListingTable():
 
 def updateSetupsListingTable(setups):
     global eventInfos
+
+    ac.setVisible(listingTableMisc['loadingLabel']['label'], 0)
 
     if len(setups) == 0:
         if activeSetupType == 'trackSpecific':
