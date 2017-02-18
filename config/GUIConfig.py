@@ -46,27 +46,27 @@ GUIConstants = {
             'version_cell': 60,
             'filename_cell': 248
         },
-        'startingYPosition': 75
+        'startingYPosition': 55
     },
     'updateTableLayout': {
         'cellHeight': 21,
         'xPos': {
             'select_cell': 5,
-            'file_name_cell': 55,
-            'track_cell': 200,
-            'trim_cell': 450,
-            'acversion_cell': 500,
-            'version_cell': 530
+            'file_name_cell': 56,
+            'track_cell': 202,
+            'trim_cell': 452,
+            'acversion_cell': 502,
+            'version_cell': 532
         },
         'cellXSize': {
             'select_cell': 50,
-            'file_name_cell': 150,
+            'file_name_cell': 146,
             'track_cell': 250,
             'trim_cell': 50,
             'acversion_cell': 30,
-            'version_cell': 60
+            'version_cell': 59
         },
-        'startingYPosition': 277
+        'startingYPosition': 267
     },
     'fontSizes': {
         'button': 16

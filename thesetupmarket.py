@@ -332,7 +332,7 @@ def initGUI(appWindow):
     ###################################
 
     ### Current track section ###
-    appTitle = ac.addLabel(appWindow, "The Setup Market | 0.6")
+    appTitle = ac.addLabel(appWindow, "The Setup Market 0.6")
     #ac.setCustomFont(<CONTROL_IDENTIFIER>,<FONTNAME>,<ITALIC>,<BOLD>)
     ac.setCustomFont(appTitle, "OpenSans", 0, 0)
     ac.setFontSize(appTitle, 15)
@@ -343,26 +343,27 @@ def initGUI(appWindow):
     ac.setVisible(refreshSetupsButton, 0)
     ac.setCustomFont(refreshSetupsButton, "OpenSans", 0, 1)
     ac.setFontSize(refreshSetupsButton, GUIConfig.GUIConstants['fontSizes']['button'])
-    ac.setPosition(refreshSetupsButton, 1033, 29)
-    ac.setSize(refreshSetupsButton, 70, 22)
+    ac.setPosition(refreshSetupsButton, 6, 34)
+    ac.setSize(refreshSetupsButton, 83, 20)
     ac.setText(refreshSetupsButton, 'Refresh')
-    ac.setBackgroundColor(refreshSetupsButton, 1, 1, 1)
-    ac.setFontColor(refreshSetupsButton, 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(refreshSetupsButton, 1)
-    ac.drawBackground(refreshSetupsButton, 1)
-    ac.drawBorder(refreshSetupsButton, 0)
+    ac.setFontSize(refreshSetupsButton, 14)
+    # ac.setBackgroundColor(refreshSetupsButton, 1, 1, 1)
+    ac.setFontColor(refreshSetupsButton, 1, 1, 1, 1)
+    ac.setBackgroundOpacity(refreshSetupsButton, 0)
+    #ac.drawBackground(refreshSetupsButton, 1)
+    ac.drawBorder(refreshSetupsButton, 1)
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
     # Add header row for track specific setups table
-    addTableCell('Track', 244, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 90, 53, 'center', False)
-    addTableCell('Author', 184, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 335, 53, 'center', False)
-    addTableCell('Trim', 49, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 520, 53, 'center', False)
-    addTableCell('Best Time', 84, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 570, 53, 'center', False)
-    addTableCell('Rating', 69, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 655, 53, 'center', False)
-    addTableCell('Dl', 39, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 725, 53, 'center', False)
-    addTableCell('AC', 29, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 765, 53, 'center', False)
-    addTableCell('Version', 59, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 795, 53, 'center', False)
-    addTableCell('File name', 248, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 855, 53, 'center', False)
+    addTableCell('Track', 244, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 90, 33, 'center', False)
+    addTableCell('Author', 184, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 335, 33, 'center', False)
+    addTableCell('Trim', 49, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'],GUIConfig.GUIConstants['tableHeaderColorB'] , 520, 33, 'center', False)
+    addTableCell('Best Time', 84, GUIConfig.GUIConstants['tableHeaderColorR'],GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 570, 33, 'center', False)
+    addTableCell('Rating', 69, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 655, 33, 'center', False)
+    addTableCell('Dl', 39, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 725, 33, 'center', False)
+    addTableCell('AC', 29, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 765, 33, 'center', False)
+    addTableCell('Version', 59, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 795, 33, 'center', False)
+    addTableCell('File name', 248, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 855, 33, 'center', False)
 
     # Init the setups listing table with empty labels
     yPos = GUIConfig.GUIConstants['tableLayout']['startingYPosition']
@@ -513,7 +514,7 @@ def initGUI(appWindow):
     ac.drawBackground(separator, 1)
     ac.drawBorder(separator, 0)
     ac.setVisible(separator, 1)
-    ac.setPosition(separator, 0, 218)
+    ac.setPosition(separator, 0, 198)
 
     # Add upload section title
     # section4Title = ac.addLabel(appWindow, "/Upload setup")
@@ -527,22 +528,24 @@ def initUploadSectionGUI():
 
     # Set the GUI elements for the general upload section
     uploadSectionGeneralElements = {
-        'uploadTypeSwitcherButton': ac.addLabel(appWindow, ''),
-        'updateTypeSwitcherButton': ac.addLabel(appWindow, '')
+        'uploadTypeSwitcherButton': ac.addButton(appWindow, ''),
+        'updateTypeSwitcherButton': ac.addButton(appWindow, '')
         # 'deleteTypeSwitcherButton': ac.addLabel(appWindow, '')
     }
 
     # Configure the button to switch to Upload
-    ac.setPosition(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 336, 226)
-    ac.setSize(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 60, 22)
+    ac.setPosition(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 490, 206)
+    ac.setSize(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 70, 24)
     ac.setText(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'Upload')
     ac.setBackgroundColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
-    ac.drawBackground(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
-    ac.drawBorder(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
+    #ac.drawBackground(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.drawBorder(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
     ac.addOnClickedListener(uploadSectionGeneralElements['uploadTypeSwitcherButton'], onUploadTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'center')
+    ac.setCustomFont(uploadSectionGeneralElements['uploadTypeSwitcherButton'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionGeneralElements['uploadTypeSwitcherButton'], GUIConfig.GUIConstants['fontSizes']['button'])
 
     if uploadAvailability:
         ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
@@ -550,16 +553,18 @@ def initUploadSectionGUI():
         ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
 
     # Configure the button to switch to Update
-    ac.setPosition(uploadSectionGeneralElements['updateTypeSwitcherButton'], 396, 226)
-    ac.setSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], 60, 22)
+    ac.setPosition(uploadSectionGeneralElements['updateTypeSwitcherButton'], 560, 206)
+    ac.setSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], 70, 24)
     ac.setText(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'Update')
-    ac.setBackgroundColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
-    ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
-    ac.drawBackground(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
-    ac.drawBorder(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    # ac.setBackgroundColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
+    ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    #ac.drawBackground(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    ac.drawBorder(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
     ac.addOnClickedListener(uploadSectionGeneralElements['updateTypeSwitcherButton'], onUpdateTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'center')
+    ac.setCustomFont(uploadSectionGeneralElements['updateTypeSwitcherButton'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], GUIConfig.GUIConstants['fontSizes']['button'])
 
     if uploadAvailability:
         ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
@@ -598,20 +603,22 @@ def initUploadSectionGUI():
 
     # Add reset upload section button
     ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
-    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 1033, 226)
+    ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 6, 207)
     ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
-    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 22)
+    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 19)
     ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
-    ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
-    ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 1)
-    ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
-    ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 0)
+    ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], 14)
+    # ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'],1, 1, 1, 1)
+    ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 0)
+    # ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
+    ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 1)
     ac.addOnClickedListener(uploadSectionElements['refreshUploadGUIButton'], onRefreshUploadSectionButtonClick)
 
     # Configure the error message label
-    ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 275)
+    ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 300)
+    ac.setCustomFont(uploadSectionElements['uploadMessageLabel'], "OpenSans", 0, 0)
     ac.setSize(uploadSectionElements['uploadMessageLabel'], 1100, 22)
     ac.setFontAlignment(uploadSectionElements['uploadMessageLabel'], 'center')
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
@@ -707,21 +714,23 @@ def initUploadSectionGUI():
     ac.setVisible(updateSectionElements['updateMessageLabel'], 0)
 
     # Set the listing table header
-    addTableCell('File name', 145, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 55, 255, 'center', updateSectionElements['listingTableFilenameHeader'])
-    addTableCell('Track', GUIConfig.GUIConstants['tableLayout']['cellXSize']['track_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 200, 255, 'center', updateSectionElements['listingTableTrackHeader'])
-    addTableCell('Trim', GUIConfig.GUIConstants['tableLayout']['cellXSize']['trim_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 450, 255, 'center', updateSectionElements['listingTableTrimHeader'])
-    addTableCell('AC', GUIConfig.GUIConstants['tableLayout']['cellXSize']['acversion_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 500, 255, 'center', updateSectionElements['listingTableAcVersionHeader'])
-    addTableCell('Version', GUIConfig.GUIConstants['tableLayout']['cellXSize']['version_cell'], GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 530, 255, 'center', updateSectionElements['listingTableSetupVersionHeader'])
+    addTableCell('File name', 145, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 56, 245, 'center', updateSectionElements['listingTableFilenameHeader'])
+    addTableCell('Track', 249, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 202, 245, 'center', updateSectionElements['listingTableTrackHeader'])
+    addTableCell('Trim', 49, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 452, 245, 'center', updateSectionElements['listingTableTrimHeader'])
+    addTableCell('AC', 29, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 502, 245, 'center', updateSectionElements['listingTableAcVersionHeader'])
+    addTableCell('Version', 59, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 532, 245, 'center', updateSectionElements['listingTableSetupVersionHeader'])
 
     # Set the refresh update section button
-    ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 70, 22)
-    ac.setPosition(updateSectionElements['refreshUpdateGUIButton'], 720, 226)
+    ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 70, 19)
+    ac.setPosition(updateSectionElements['refreshUpdateGUIButton'], 6, 207)
     ac.setText(updateSectionElements['refreshUpdateGUIButton'], 'Refresh')
-    ac.setBackgroundColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1)
-    ac.setFontColor(updateSectionElements['refreshUpdateGUIButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(updateSectionElements['refreshUpdateGUIButton'], 1)
-    ac.drawBackground(updateSectionElements['refreshUpdateGUIButton'], 1)
-    ac.drawBorder(updateSectionElements['refreshUpdateGUIButton'], 0)
+    ac.setCustomFont(updateSectionElements['refreshUpdateGUIButton'], "OpenSans", 0, 1)
+    ac.setFontSize(updateSectionElements['refreshUpdateGUIButton'], 14)
+    # ac.setBackgroundColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1)
+    ac.setFontColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['refreshUpdateGUIButton'], 0)
+    # ac.drawBackground(updateSectionElements['refreshUpdateGUIButton'], 1)
+    ac.drawBorder(updateSectionElements['refreshUpdateGUIButton'], 1)
     ac.addOnClickedListener(updateSectionElements['refreshUpdateGUIButton'], onRefreshUpdateSectionButtonClick)
     ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
 
@@ -897,7 +906,7 @@ def initUploadSectionGUI():
 
     # Setting up the setups listing table page spinner
     updateListingTablePageSpinner = ac.addSpinner(appWindow, '')
-    ac.setPosition(updateListingTablePageSpinner, 529, 390)
+    ac.setPosition(updateListingTablePageSpinner, 531, 379)
     ac.setSize(updateListingTablePageSpinner, 60, 20)
     ac.setVisible(updateListingTablePageSpinner, 0)
 
@@ -1795,8 +1804,10 @@ def onUploadTypeSwitcherButtonClick(*args):
     hideUpdateSection()
     showUploadNewSection()
     onRefreshUploadSectionButtonClick()
-    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1, 1)
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
 
 
 def onUpdateTypeSwitcherButtonClick(*args):
@@ -1804,8 +1815,10 @@ def onUpdateTypeSwitcherButtonClick(*args):
     hideUploadNewSection()
     refreshUpdateSection()
 
-    GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0, 0, 0)
+    ac.setBackgroundOpacity(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
+    ac.setFontColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1, 1)
     GUIhelpers.changeElementBgColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1)
+    ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
 
     refreshUserSetupsListingTable()
 
