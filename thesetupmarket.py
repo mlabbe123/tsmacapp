@@ -606,7 +606,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 6, 207)
     ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
-    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 70, 19)
+    ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 83, 20)
     ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], 14)
     # ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
@@ -619,6 +619,7 @@ def initUploadSectionGUI():
     # Configure the error message label
     ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 300)
     ac.setCustomFont(uploadSectionElements['uploadMessageLabel'], "OpenSans", 0, 0)
+    ac.setFontSize(uploadSectionElements['uploadMessageLabel'], 15)
     ac.setSize(uploadSectionElements['uploadMessageLabel'], 1100, 22)
     ac.setFontAlignment(uploadSectionElements['uploadMessageLabel'], 'center')
     ac.setVisible(uploadSectionElements['uploadMessageLabel'], 0)
@@ -673,9 +674,11 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
 
     # Configure the upload button
-    ac.setPosition(uploadSectionElements['uploadButton'], 720, 312)
-    ac.setSize(uploadSectionElements['uploadButton'], 70, 22)
+    ac.setPosition(uploadSectionElements['uploadButton'], 435, 352)
+    ac.setSize(uploadSectionElements['uploadButton'], 90, 25)
     ac.setText(uploadSectionElements['uploadButton'], 'Upload')
+    ac.setCustomFont(uploadSectionElements['uploadButton'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['uploadButton'], 17)
     ac.setBackgroundColor(uploadSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
     ac.setFontColor(uploadSectionElements['uploadButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(uploadSectionElements['uploadButton'], 1)
@@ -721,7 +724,7 @@ def initUploadSectionGUI():
     addTableCell('Version', 59, GUIConfig.GUIConstants['tableHeaderColorR'], GUIConfig.GUIConstants['tableHeaderColorG'], GUIConfig.GUIConstants['tableHeaderColorB'], 532, 245, 'center', updateSectionElements['listingTableSetupVersionHeader'])
 
     # Set the refresh update section button
-    ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 70, 19)
+    ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 83, 20)
     ac.setPosition(updateSectionElements['refreshUpdateGUIButton'], 6, 207)
     ac.setText(updateSectionElements['refreshUpdateGUIButton'], 'Refresh')
     ac.setCustomFont(updateSectionElements['refreshUpdateGUIButton'], "OpenSans", 0, 1)
@@ -735,65 +738,77 @@ def initUploadSectionGUI():
     ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
 
     # Set the update race trim selector button
-    ac.setPosition(updateSectionElements['trimSelectorRaceButton'], 600, 255)
+    ac.setPosition(updateSectionElements['trimSelectorRaceButton'], 610, 245)
     ac.setSize(updateSectionElements['trimSelectorRaceButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorRaceButton'], 'Race')
+    ac.setCustomFont(updateSectionElements['trimSelectorRaceButton'], "OpenSans", 0, 0)
+    ac.setFontSize(updateSectionElements['trimSelectorRaceButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
-    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 1)
-    ac.drawBackground(updateSectionElements['trimSelectorRaceButton'], 1)
-    ac.drawBorder(updateSectionElements['trimSelectorRaceButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
+    # ac.drawBackground(updateSectionElements['trimSelectorRaceButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorRaceButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorRaceButton'], onUpdateTrimSelectorRaceButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 0)
 
     # Set the update qualy trim selector button
-    ac.setPosition(updateSectionElements['trimSelectorQualyButton'], 663, 255)
-    ac.setSize(updateSectionElements['trimSelectorQualyButton'], 64, 22)
+    ac.setPosition(updateSectionElements['trimSelectorQualyButton'], 673, 245)
+    ac.setSize(updateSectionElements['trimSelectorQualyButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorQualyButton'], 'Qualy')
+    ac.setCustomFont(updateSectionElements['trimSelectorQualyButton'], "OpenSans", 0, 0)
+    ac.setFontSize(updateSectionElements['trimSelectorQualyButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
-    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 1)
-    ac.drawBackground(updateSectionElements['trimSelectorQualyButton'], 1)
-    ac.drawBorder(updateSectionElements['trimSelectorQualyButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
+   #  ac.drawBackground(updateSectionElements['trimSelectorQualyButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorQualyButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorQualyButton'], onUpdateTrimSelectorQualyButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 0)
 
     # Set the update base trim selector button
-    ac.setPosition(updateSectionElements['trimSelectorBaseButton'], 727, 255)
+    ac.setPosition(updateSectionElements['trimSelectorBaseButton'], 736, 245)
     ac.setSize(updateSectionElements['trimSelectorBaseButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorBaseButton'], 'Base')
+    ac.setCustomFont(updateSectionElements['trimSelectorBaseButton'], "OpenSans", 0, 0)
+    ac.setFontSize(updateSectionElements['trimSelectorBaseButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
-    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 1)
-    ac.drawBackground(updateSectionElements['trimSelectorBaseButton'], 1)
-    ac.drawBorder(updateSectionElements['trimSelectorBaseButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
+    # ac.drawBackground(updateSectionElements['trimSelectorBaseButton'], 1)
+    ac.drawBorder(updateSectionElements['trimSelectorBaseButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorBaseButton'], onUpdateTrimSelectorBaseButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorBaseButton'], 0)
 
     # Set the update track specific button
-    ac.setPosition(updateSectionElements['baselineSelectorButton'], 600, 285)
+    ac.setPosition(updateSectionElements['baselineSelectorButton'], 610, 275)
     ac.setSize(updateSectionElements['baselineSelectorButton'], 190, 22)
     ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
+    ac.setCustomFont(updateSectionElements['baselineSelectorButton'], "OpenSans", 0, 0)
+    ac.setFontSize(updateSectionElements['baselineSelectorButton'], 15)
     ac.setBackgroundColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
-    ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 1)
-    ac.drawBackground(updateSectionElements['baselineSelectorButton'], 1)
-    ac.drawBorder(updateSectionElements['baselineSelectorButton'], 0)
+    ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 0)
+    # ac.drawBackground(updateSectionElements['baselineSelectorButton'], 1)
+    ac.drawBorder(updateSectionElements['baselineSelectorButton'], 1)
     ac.addOnClickedListener(updateSectionElements['baselineSelectorButton'], onUpdateBaselineSelectorButtonClick)
     ac.setVisible(updateSectionElements['baselineSelectorButton'], 0)
 
     # Set the update file selector button
-    ac.setPosition(updateSectionElements['fileSelectorButton'], 600, 315)
+    ac.setPosition(updateSectionElements['fileSelectorButton'], 610, 305)
     ac.setSize(updateSectionElements['fileSelectorButton'], 190, 22)
     ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
+    ac.setCustomFont(updateSectionElements['fileSelectorButton'], "OpenSans", 0, 0)
+    ac.setFontSize(updateSectionElements['fileSelectorButton'], 14)
     ac.addOnClickedListener(updateSectionElements['fileSelectorButton'], onUpdateFileSelectorButtonClick)
     ac.setVisible(updateSectionElements['fileSelectorButton'], 0)
 
     # Set the update button
-    ac.setPosition(updateSectionElements['uploadButton'], 630, 345)
-    ac.setSize(updateSectionElements['uploadButton'], 130, 22)
+    ac.setPosition(updateSectionElements['uploadButton'], 660, 350)
+    ac.setSize(updateSectionElements['uploadButton'], 90, 25)
     ac.setText(updateSectionElements['uploadButton'], 'Update')
+    ac.setCustomFont(updateSectionElements['uploadButton'], "OpenSans", 0, 1)
     ac.setBackgroundColor(updateSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
+    ac.setFontSize(updateSectionElements['uploadButton'], 17)
     ac.setFontColor(updateSectionElements['uploadButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(updateSectionElements['uploadButton'], 1)
     ac.drawBackground(updateSectionElements['uploadButton'], 1)
@@ -855,22 +870,13 @@ def initUploadSectionGUI():
             ac.setText(label, '')
             ac.setSize(label, GUIConfig.GUIConstants['updateTableLayout']['cellXSize'][cellId],
                        GUIConfig.GUIConstants['updateTableLayout']['cellHeight'])
+            ac.setCustomFont(label, 'OpenSans', 0, 0)
+            ac.setFontSize(label, 15)
 
             if cellId == 'select_cell':
                 ac.setBackgroundColor(label, 1, 1, 1)
                 ac.setFontColor(label, 0.25098, 0.66274, 0.66274, 1)
-            else:
-                ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'],
-                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'],
-                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])
 
-            ac.setBackgroundOpacity(label, 1)
-            ac.drawBackground(label, 1)
-            ac.drawBorder(label, 0)
-            ac.setVisible(label, 0)
-            ac.setFontAlignment(label, 'center')
-
-            if cellId == 'select_cell':
                 if rowNumber == 1:
                     ac.addOnClickedListener(label, onSelectUserSetupUpdateButton1Clicked)
                 elif rowNumber == 2:
@@ -881,6 +887,20 @@ def initUploadSectionGUI():
                     ac.addOnClickedListener(label, onSelectUserSetupUpdateButton4Clicked)
                 elif rowNumber == 5:
                     ac.addOnClickedListener(label, onSelectUserSetupUpdateButton5Clicked)
+            else:
+                if cellId == 'file_name_cell':
+                    ac.setFontSize(label, 14)
+
+                ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'],
+                                      GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'B'])
+
+            ac.setBackgroundOpacity(label, 1)
+            ac.drawBackground(label, 1)
+            ac.drawBorder(label, 0)
+            ac.setVisible(label, 0)
+            ac.setFontAlignment(label, 'center')
+
 
         yPos += GUIConfig.GUIConstants['updateTableLayout']['cellHeight'] + 1
         rowNumber += 1
@@ -897,10 +917,10 @@ def initUploadSectionGUI():
     }
 
     ac.setPosition(listingUpdateTableMisc['emptyRowLabel']['label'], 5, 315)
-    ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 1100, 22)
+    ac.setSize(listingUpdateTableMisc['emptyRowLabel']['label'], 650, 22)
     ac.setFontAlignment(listingUpdateTableMisc['emptyRowLabel']['label'], 'center')
 
-    ac.setPosition(updateSectionElements['updateOptionsMessageLabel'], 595, 290)
+    ac.setPosition(updateSectionElements['updateOptionsMessageLabel'], 650, 280)
     ac.setSize(updateSectionElements['updateOptionsMessageLabel'], 200, 22)
     ac.setFontAlignment(updateSectionElements['updateOptionsMessageLabel'], 'center')
 
@@ -978,6 +998,9 @@ def refreshUpdateSection():
                 ac.setText(listingUpdateTableMisc['emptyRowLabel']['label'], 'No setups found to be updated for this track')
                 ac.setVisible(listingUpdateTableMisc['emptyRowLabel']['label'], 1)
                 showUpdateSection()
+
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
 
 
 def showUploadingMessage():
@@ -1120,6 +1143,10 @@ def updateSetupsListingTable(setups):
 ## Show/Hide sections functions
 ##################################
 def showUploadNewSection():
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
+
     for key, element in uploadSectionElements.items():
         # Check also if a message should be displayed (if the user have no file in the folder for exemple)
         if key != 'uploadMessageLabel':
@@ -1132,9 +1159,14 @@ def hideUploadNewSection():
             ac.setVisible(element, 0)
 
     ac.setVisible(updateListingTablePageSpinner, 0)
+    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
 
 
 def showUpdateSection():
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
+    ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 1)
+
     for key, element in updateSectionElements.items():
         # Check also if a message should be displayed (if the user have no uploaded setup to update for exemple)
         if key == 'updateMessageLabel':
@@ -1147,6 +1179,8 @@ def showUpdateSection():
 
 
 def hideUpdateSection():
+    ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
+
     for key, element in updateSectionElements.items():
         ac.setVisible(element, 0)
 
@@ -1195,17 +1229,36 @@ def showUpdateUserSetupDetails(setupDetails):
     ac.setVisible(updateSectionElements['fileSelectorButton'], 1)
 
     if setupDetails['type'] == 'race':
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 1)
+        ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 0.25098, 0.66274, 0.66274, 1)
+        # cahnge font color
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
     elif setupDetails['type'] == 'qualy':
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 1)
+        ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 0.25098, 0.66274, 0.66274, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
     else:
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-        GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
+        ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 1)
+        ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 0.25098, 0.66274, 0.66274, 1)
 
     ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 1)
     ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 1)
@@ -1223,10 +1276,14 @@ def showUpdateUserSetupDetails(setupDetails):
 
     if setupDetails['track']['_id'] == '55db6db13cc3a26dcae7116d':
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Baseline setup')
-        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 0, 0, 0)
+        ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 0)
+        ac.setFontColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1, 1)
     else:
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
-        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 1)
+        ac.setFontColor(updateSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
+
+
     ac.setVisible(updateSectionElements['baselineSelectorButton'], 1)
 
     ac.setVisible(updateSectionElements['uploadButton'], 1)
@@ -1321,6 +1378,7 @@ def updateUserSetupsListingTable(setups):
                 ac.setText(labelCtrl, 'Select')
             elif cellName == 'file_name_cell':
                 ac.setText(labelCtrl, setup['file_name'])
+                ac.setFontSize(labelCtrl, 13)
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'trim_cell':
@@ -1619,6 +1677,7 @@ def onRefreshSetupsButtonClick(*args):
     # Hide setups listing refresh button
     ac.setVisible(refreshSetupsButton, 0)
     ac.setVisible(listingTableSetupTypeButton, 0)
+    ac.setVisible(listingTablePageSpinner, 0)
 
     # Hide setups listing table
     hideSetupsListingTable()
@@ -1670,6 +1729,9 @@ def onUploadButtonClick(*args):
     # Hide upload section GUI
     hideUploadNewSection()
     showUploadingMessage()
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
 
     isUploaded = tsm.uploadSetup(userTSMId, current_ac_version, userSteamId, currentUploadFileName, currentUploadTrim, currentUploadBaseline, current_carId, current_trackId, currentCarName, currentTrackBaseName, currentTrackLayout)
 
@@ -1734,6 +1796,8 @@ def onRefreshUpdateSectionButtonClick(*args):
 
     hideUpdateSection()
     hideUploadNewSection()
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
     ac.setText(updateSectionElements['updateMessageLabel'], 'Loading...')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
 
@@ -1765,11 +1829,13 @@ def onUpdateBaselineSelectorButtonClick(*args):
 
     if not currentUpdateBaseline:
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Any tracks')
-        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 0, 0, 0)
+        ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 0)
+        ac.setFontColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1, 1)
         currentUpdateBaseline = True
     else:
         ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
-        GUIhelpers.changeElementBgColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
+        ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 1)
+        ac.setFontColor(updateSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
         currentUpdateBaseline = False
 
 
@@ -1792,6 +1858,10 @@ def onUpdateFileSelectorButtonClick(*args):
 def onUpdateUploadButtonClick(*args):
     ac.log('TheSetupMarket logs | onUpdateUploadButtonClick')
     hideUpdateSection()
+    ac.setVisible(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0)
+    ac.setVisible(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
+    ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
+    ac.setVisible(updateListingTablePageSpinner, 0)
     ac.setText(updateSectionElements['updateMessageLabel'], 'Uploading...')
     ac.setVisible(updateSectionElements['updateMessageLabel'], 1)
 
@@ -1932,9 +2002,15 @@ def onUpdateTrimSelectorRaceButtonClick(*args):
     global currentUpdateTrim
     ac.log('TheSetupMarket logs | onUpdateTrimSelectorRaceButtonClick')
 
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 1)
+    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
 
     currentUpdateTrim = 'race'
 
@@ -1943,9 +2019,15 @@ def onUpdateTrimSelectorQualyButtonClick(*args):
     global currentUpdateTrim
     ac.log('TheSetupMarket logs | onUpdateTrimSelectorQualyButtonClick')
 
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 1)
+    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 0.25098, 0.66274, 0.66274, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
 
     currentUpdateTrim = 'qualy'
 
@@ -1954,9 +2036,15 @@ def onUpdateTrimSelectorBaseButtonClick(*args):
     global currentUpdateTrim
     ac.log('TheSetupMarket logs | onUpdateTrimSelectorBaseButtonClick')
 
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-    GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
+    #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
+    ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
+    ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 1)
+    ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 0.25098, 0.66274, 0.66274, 1)
 
     currentUpdateTrim = 'base'
 
