@@ -628,12 +628,16 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['fileSelectorButtonLabel'], 5, 290)
     ac.setSize(uploadSectionElements['fileSelectorButtonLabel'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButtonLabel'], 'Select a file to upload (click to cycle files)')
+    ac.setCustomFont(uploadSectionElements['fileSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['fileSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
 
     # Configure the file selector button
-    ac.setPosition(uploadSectionElements['fileSelectorButton'], 5, 312)
+    ac.setPosition(uploadSectionElements['fileSelectorButton'], 5, 317)
     ac.setSize(uploadSectionElements['fileSelectorButton'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
+    ac.setCustomFont(uploadSectionElements['fileSelectorButton'], "OpenSans", 0, 0)
+    ac.setFontSize(uploadSectionElements['fileSelectorButton'], 15)
     ac.addOnClickedListener(uploadSectionElements['fileSelectorButton'], onFileSelectorButtonClick)
     ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
 
@@ -641,12 +645,16 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['trimSelectorButtonLabel'], 350, 290)
     ac.setSize(uploadSectionElements['trimSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButtonLabel'], 'Select a trim:')
+    ac.setCustomFont(uploadSectionElements['trimSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['trimSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
 
     # Configure the upload setup trim selector
-    ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 312)
+    ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 317)
     ac.setSize(uploadSectionElements['trimSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
+    ac.setCustomFont(uploadSectionElements['trimSelectorButton'], "OpenSans", 0, 0)
+    ac.setFontSize(uploadSectionElements['trimSelectorButton'], 15)
     ac.setBackgroundColor(uploadSectionElements['trimSelectorButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionElements['trimSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(uploadSectionElements['trimSelectorButton'], 1)
@@ -656,15 +664,19 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['trimSelectorButton'], 0)
 
     # Configure the setup baseline selector label
-    ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 450, 290)
+    ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 460, 290)
     ac.setSize(uploadSectionElements['baselineSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButtonLabel'], 'Track Specific?')
+    ac.setCustomFont(uploadSectionElements['baselineSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setFontSize(uploadSectionElements['baselineSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
 
     # Configure the baseline selector button
-    ac.setPosition(uploadSectionElements['baselineSelectorButton'], 450, 312)
+    ac.setPosition(uploadSectionElements['baselineSelectorButton'], 460, 317)
     ac.setSize(uploadSectionElements['baselineSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButton'], 'Yes')
+    ac.setCustomFont(uploadSectionElements['baselineSelectorButton'], "OpenSans", 0, 0)
+    ac.setFontSize(uploadSectionElements['baselineSelectorButton'], 15)
     ac.setBackgroundColor(uploadSectionElements['baselineSelectorButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(uploadSectionElements['baselineSelectorButton'], 1)
@@ -674,7 +686,7 @@ def initUploadSectionGUI():
     ac.setVisible(uploadSectionElements['baselineSelectorButton'], 0)
 
     # Configure the upload button
-    ac.setPosition(uploadSectionElements['uploadButton'], 435, 352)
+    ac.setPosition(uploadSectionElements['uploadButton'], 445, 352)
     ac.setSize(uploadSectionElements['uploadButton'], 90, 25)
     ac.setText(uploadSectionElements['uploadButton'], 'Upload')
     ac.setCustomFont(uploadSectionElements['uploadButton'], "OpenSans", 0, 1)
@@ -1075,6 +1087,8 @@ def updateSetupsListingTable(setups):
 
         for cellName, labelCtrl in listingTable[rowNumber].items():
             ac.setVisible(labelCtrl, 1)
+            ac.setCustomFont(labelCtrl, "OpenSans", 0, 0)
+            ac.setFontSize(labelCtrl, 15)
 
             if cellName == 'dl_cell':
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
