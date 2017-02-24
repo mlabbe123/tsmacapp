@@ -129,7 +129,7 @@ def initUploadSection():
     userTSMId = tsm.getUserTSMIdWithSteamID(userSteamId)
     ac.log('TheSetupMarket logs | userTSMId = ' + str(userTSMId))
 
-    # Get the active AC version
+    # Get the active AC version (Does nothing, isnt compared to system ac version)
     current_ac_version = tsm.get_ac_version_from_api()
     ac.log('TheSetupMarket logs | current_ac_version = ' + str(current_ac_version))
 
@@ -380,7 +380,6 @@ def initGUI(appWindow):
             ac.setFontAlignment(label, 'center')
 
             if cellId != 'rating_cell':
-                ac.log('SET CUSTOM FONT FOR: '+cellId)
                 ac.setCustomFont(label, "Open Sans", 0, 0)
                 ac.setFontSize(label, 15)
 
@@ -426,7 +425,6 @@ def initGUI(appWindow):
         ac.setText(labelCtrl, labelText)
 
         if 'Star' not in labelName:
-            ac.log('CHANGE FONT FOR: '+labelName)
             ac.setCustomFont(labelCtrl, "Open Sans", 0, 0)
             ac.setFontSize(labelCtrl, 15)
 
@@ -599,7 +597,7 @@ def initUploadSectionGUI():
     }
 
     # Add reset upload section button
-    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
     ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 6, 207)
     ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
@@ -951,24 +949,29 @@ def refreshUploadSection():
             ac.log('TheSetupMarket logs | refreshUploadSection: User steamCommunityID not found in TSM DB')
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'Go to thesetupmarket.com to create an account and link it with your steam account')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+            showRefreshButton = True
         elif not current_carId:
             ac.log('TheSetupMarket logs | refreshUploadSection: The car is not available for uploads')
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'The car is not available for upload yet')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+            showRefreshButton = False
         elif not current_trackId:
             ac.log('TheSetupMarket logs | refreshUploadSection: The track is not available for uploads')
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'The track is not available for uploads yet')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+            showRefreshButton = False
         elif not current_ac_version:
             ac.log('TheSetupMarket logs | refreshUploadSection: The current_ac_version is not available for uploads')
-            ac.setText(uploadSectionElements['uploadMessageLabel'], 'The current_ac_version is not available for uploads yet')
+            ac.setText(uploadSectionElements['uploadMessageLabel'], 'The current AC version is not available for uploads yet')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+            showRefreshButton = False
         elif len(allSetupsFileNamesInFolder) == 0:
             ac.log('TheSetupMarket logs | refreshUploadSection: There are no files in the current track setups folder for this car')
             ac.setText(uploadSectionElements['uploadMessageLabel'], 'There are no files to upload in the current track setups folder for this car')
             ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
+            showRefreshButton = True
 
-        hideUploadNewSection()
+        hideUploadNewSection(showRefreshButton)
         ac.setVisible(uploadSectionElements['uploadMessageLabel'], 1)
 
 
@@ -1072,7 +1075,7 @@ def updateSetupsListingTable(setups):
         setupId = setup['_id']
 
         eventInfos['setupIds'][rowNumber - 1] = setupId
-        eventInfos['setupFilenames'][rowNumber - 1] = 'TSM-ac' + str(setup['sim_version']) + '_' + setup['author']['display_name'].replace(' ', '') + '_' + setup['type'] + '_' + setup['track']['name'] + '_v' + str(setup['version']) + '.ini'
+        eventInfos['setupFilenames'][rowNumber - 1] = str(setup['file_name']).replace('.ini', '') + '.ini'
 
         for cellName, labelCtrl in listingTable[rowNumber].items():
             ac.setVisible(labelCtrl, 1)
@@ -1154,13 +1157,16 @@ def showUploadNewSection():
             ac.setVisible(element, 1)
 
 
-def hideUploadNewSection():
+def hideUploadNewSection(showRefreshButton = False):
     for key, element in uploadSectionElements.items():
         if key != 'refreshUploadGUIButton':
             ac.setVisible(element, 0)
 
     ac.setVisible(updateListingTablePageSpinner, 0)
-    ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
+    if showRefreshButton:
+        ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 1)
+    else:
+        ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
 
 
 def showUpdateSection():
