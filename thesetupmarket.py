@@ -79,8 +79,7 @@ def checkIfServerDown():
 def acMain(ac_version):
     global appWindow, currentCarName, currentTrackBaseName, currentTrackLayout, activeSetupType
 
-    # Initialize font // ac.initFont(0,<FONTNAME>,<ITALIC>,<BOLD>)
-    ac.initFont(0, "OpenSans", 1, 1)
+    ac.initFont(0, "Open Sans", 0, 0)
 
     appWindow = ac.newApp("The Setup Market")
     ac.setTitle(appWindow, "")
@@ -169,8 +168,9 @@ def initUploadSection():
     refreshUploadSection()
 
 
-def acUpdate(delta_t):
-    doNothing = 1
+# Was needed for async feature (I think) but its nor more... For some reason...
+#def acUpdate(delta_t):
+#    doNothing = 1
 
 
 def initAppWithError(state='IMPORT_ERROR'):
@@ -333,24 +333,21 @@ def initGUI(appWindow):
 
     ### Current track section ###
     appTitle = ac.addLabel(appWindow, "The Setup Market 0.6")
-    #ac.setCustomFont(<CONTROL_IDENTIFIER>,<FONTNAME>,<ITALIC>,<BOLD>)
-    ac.setCustomFont(appTitle, "OpenSans", 0, 0)
+    ac.setCustomFont(appTitle, "Open Sans", 0, 0)
     ac.setFontSize(appTitle, 15)
     ac.setPosition(appTitle, 50, 5)
 
     # Setting up the refresh setups button
     refreshSetupsButton = ac.addButton(appWindow, '')
     ac.setVisible(refreshSetupsButton, 0)
-    ac.setCustomFont(refreshSetupsButton, "OpenSans", 0, 1)
+    ac.setCustomFont(refreshSetupsButton, "Open Sans", 0, 1)
     ac.setFontSize(refreshSetupsButton, GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setPosition(refreshSetupsButton, 6, 34)
     ac.setSize(refreshSetupsButton, 83, 20)
     ac.setText(refreshSetupsButton, 'Refresh')
     ac.setFontSize(refreshSetupsButton, 14)
-    # ac.setBackgroundColor(refreshSetupsButton, 1, 1, 1)
     ac.setFontColor(refreshSetupsButton, 1, 1, 1, 1)
     ac.setBackgroundOpacity(refreshSetupsButton, 0)
-    #ac.drawBackground(refreshSetupsButton, 1)
     ac.drawBorder(refreshSetupsButton, 1)
     ac.addOnClickedListener(refreshSetupsButton, onRefreshSetupsButtonClick)
 
@@ -381,8 +378,11 @@ def initGUI(appWindow):
             ac.drawBorder(label, 0)
             ac.setVisible(label, 0)
             ac.setFontAlignment(label, 'center')
-            ac.setCustomFont(label, "OpenSans", 0, 0)
-            ac.setFontSize(label, 15)
+
+            if cellId != 'rating_cell':
+                ac.log('SET CUSTOM FONT FOR: '+cellId)
+                ac.setCustomFont(label, "Open Sans", 0, 0)
+                ac.setFontSize(label, 15)
 
             if cellId == 'dl_cell':
                 if rowNumber == 1:
@@ -424,8 +424,12 @@ def initGUI(appWindow):
             ac.setVisible(labelCtrl, 0)
 
         ac.setText(labelCtrl, labelText)
-        ac.setCustomFont(labelCtrl, "OpenSans", 0, 0)
-        ac.setFontSize(labelCtrl, 15)
+
+        if 'Star' not in labelName:
+            ac.log('CHANGE FONT FOR: '+labelName)
+            ac.setCustomFont(labelCtrl, "Open Sans", 0, 0)
+            ac.setFontSize(labelCtrl, 15)
+
         ac.setPosition(labelCtrl, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + GUIConfig.GUIConstants['tableLayout']['cellHeight'] * 2)
         ac.setSize(labelCtrl, 1110, GUIConfig.GUIConstants['tableLayout']['cellHeight'])
         ac.drawBorder(labelCtrl, 0)
@@ -488,7 +492,7 @@ def initGUI(appWindow):
     # Setting up the setups listing setup type button
     listingTableSetupTypeButton = ac.addButton(appWindow, '')
     ac.setVisible(listingTableSetupTypeButton, 0)
-    ac.setCustomFont(listingTableSetupTypeButton, "OpenSans", 0, 1)
+    ac.setCustomFont(listingTableSetupTypeButton, "Open Sans", 0, 1)
     ac.setFontSize(listingTableSetupTypeButton, GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setPosition(listingTableSetupTypeButton, 5, GUIConfig.GUIConstants['tableLayout']['startingYPosition'] + 115)
     ac.setSize(listingTableSetupTypeButton, 140, 22)
@@ -516,10 +520,6 @@ def initGUI(appWindow):
     ac.setVisible(separator, 1)
     ac.setPosition(separator, 0, 198)
 
-    # Add upload section title
-    # section4Title = ac.addLabel(appWindow, "/Upload setup")
-    # ac.setPosition(section4Title, 10, 235)
-
 
 def initUploadSectionGUI():
     global updateListingTablePageSpinner, updateSectionElements, uploadSectionElements, updateListingTable, listingUpdateTableMisc, uploadSectionGeneralElements
@@ -540,11 +540,10 @@ def initUploadSectionGUI():
     ac.setBackgroundColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
-    #ac.drawBackground(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
     ac.drawBorder(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 1)
     ac.addOnClickedListener(uploadSectionGeneralElements['uploadTypeSwitcherButton'], onUploadTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['uploadTypeSwitcherButton'], 'center')
-    ac.setCustomFont(uploadSectionGeneralElements['uploadTypeSwitcherButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionGeneralElements['uploadTypeSwitcherButton'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionGeneralElements['uploadTypeSwitcherButton'], GUIConfig.GUIConstants['fontSizes']['button'])
 
     if uploadAvailability:
@@ -556,14 +555,12 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionGeneralElements['updateTypeSwitcherButton'], 560, 206)
     ac.setSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], 70, 24)
     ac.setText(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'Update')
-    # ac.setBackgroundColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0, 0, 0)
     ac.setFontColor(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(uploadSectionGeneralElements['updateTypeSwitcherButton'], 0)
-    #ac.drawBackground(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
     ac.drawBorder(uploadSectionGeneralElements['updateTypeSwitcherButton'], 1)
     ac.addOnClickedListener(uploadSectionGeneralElements['updateTypeSwitcherButton'], onUpdateTypeSwitcherButtonClick)
     ac.setFontAlignment(uploadSectionGeneralElements['updateTypeSwitcherButton'], 'center')
-    ac.setCustomFont(uploadSectionGeneralElements['updateTypeSwitcherButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionGeneralElements['updateTypeSwitcherButton'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionGeneralElements['updateTypeSwitcherButton'], GUIConfig.GUIConstants['fontSizes']['button'])
 
     if uploadAvailability:
@@ -604,21 +601,19 @@ def initUploadSectionGUI():
     # Add reset upload section button
     ac.setVisible(uploadSectionElements['refreshUploadGUIButton'], 0)
     ac.setPosition(uploadSectionElements['refreshUploadGUIButton'], 6, 207)
-    ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionElements['refreshUploadGUIButton'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], GUIConfig.GUIConstants['fontSizes']['button'])
     ac.setSize(uploadSectionElements['refreshUploadGUIButton'], 83, 20)
     ac.setText(uploadSectionElements['refreshUploadGUIButton'], 'Refresh')
     ac.setFontSize(uploadSectionElements['refreshUploadGUIButton'], 14)
-    # ac.setBackgroundColor(uploadSectionElements['refreshUploadGUIButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionElements['refreshUploadGUIButton'],1, 1, 1, 1)
     ac.setBackgroundOpacity(uploadSectionElements['refreshUploadGUIButton'], 0)
-    # ac.drawBackground(uploadSectionElements['refreshUploadGUIButton'], 1)
     ac.drawBorder(uploadSectionElements['refreshUploadGUIButton'], 1)
     ac.addOnClickedListener(uploadSectionElements['refreshUploadGUIButton'], onRefreshUploadSectionButtonClick)
 
     # Configure the error message label
     ac.setPosition(uploadSectionElements['uploadMessageLabel'], 0, 300)
-    ac.setCustomFont(uploadSectionElements['uploadMessageLabel'], "OpenSans", 0, 0)
+    ac.setCustomFont(uploadSectionElements['uploadMessageLabel'], "Open Sans", 0, 0)
     ac.setFontSize(uploadSectionElements['uploadMessageLabel'], 15)
     ac.setSize(uploadSectionElements['uploadMessageLabel'], 1100, 22)
     ac.setFontAlignment(uploadSectionElements['uploadMessageLabel'], 'center')
@@ -628,7 +623,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['fileSelectorButtonLabel'], 5, 290)
     ac.setSize(uploadSectionElements['fileSelectorButtonLabel'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButtonLabel'], 'Select a file to upload (click to cycle files)')
-    ac.setCustomFont(uploadSectionElements['fileSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionElements['fileSelectorButtonLabel'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['fileSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['fileSelectorButtonLabel'], 0)
 
@@ -636,7 +631,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['fileSelectorButton'], 5, 317)
     ac.setSize(uploadSectionElements['fileSelectorButton'], 300, 22)
     ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
-    ac.setCustomFont(uploadSectionElements['fileSelectorButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(uploadSectionElements['fileSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(uploadSectionElements['fileSelectorButton'], 15)
     ac.addOnClickedListener(uploadSectionElements['fileSelectorButton'], onFileSelectorButtonClick)
     ac.setVisible(uploadSectionElements['fileSelectorButton'], 0)
@@ -645,7 +640,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['trimSelectorButtonLabel'], 350, 290)
     ac.setSize(uploadSectionElements['trimSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButtonLabel'], 'Select a trim:')
-    ac.setCustomFont(uploadSectionElements['trimSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionElements['trimSelectorButtonLabel'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['trimSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['trimSelectorButtonLabel'], 0)
 
@@ -653,7 +648,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['trimSelectorButton'], 350, 317)
     ac.setSize(uploadSectionElements['trimSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['trimSelectorButton'], currentUploadTrim)
-    ac.setCustomFont(uploadSectionElements['trimSelectorButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(uploadSectionElements['trimSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(uploadSectionElements['trimSelectorButton'], 15)
     ac.setBackgroundColor(uploadSectionElements['trimSelectorButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionElements['trimSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
@@ -667,7 +662,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['baselineSelectorButtonLabel'], 460, 290)
     ac.setSize(uploadSectionElements['baselineSelectorButtonLabel'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButtonLabel'], 'Track Specific?')
-    ac.setCustomFont(uploadSectionElements['baselineSelectorButtonLabel'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionElements['baselineSelectorButtonLabel'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['baselineSelectorButtonLabel'], 15)
     ac.setVisible(uploadSectionElements['baselineSelectorButtonLabel'], 0)
 
@@ -675,7 +670,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['baselineSelectorButton'], 460, 317)
     ac.setSize(uploadSectionElements['baselineSelectorButton'], 75, 22)
     ac.setText(uploadSectionElements['baselineSelectorButton'], 'Yes')
-    ac.setCustomFont(uploadSectionElements['baselineSelectorButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(uploadSectionElements['baselineSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(uploadSectionElements['baselineSelectorButton'], 15)
     ac.setBackgroundColor(uploadSectionElements['baselineSelectorButton'], 1, 1, 1)
     ac.setFontColor(uploadSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
@@ -689,7 +684,7 @@ def initUploadSectionGUI():
     ac.setPosition(uploadSectionElements['uploadButton'], 445, 352)
     ac.setSize(uploadSectionElements['uploadButton'], 90, 25)
     ac.setText(uploadSectionElements['uploadButton'], 'Upload')
-    ac.setCustomFont(uploadSectionElements['uploadButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(uploadSectionElements['uploadButton'], "Open Sans", 0, 1)
     ac.setFontSize(uploadSectionElements['uploadButton'], 17)
     ac.setBackgroundColor(uploadSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
     ac.setFontColor(uploadSectionElements['uploadButton'], 1, 1, 1, 1)
@@ -739,12 +734,10 @@ def initUploadSectionGUI():
     ac.setSize(updateSectionElements['refreshUpdateGUIButton'], 83, 20)
     ac.setPosition(updateSectionElements['refreshUpdateGUIButton'], 6, 207)
     ac.setText(updateSectionElements['refreshUpdateGUIButton'], 'Refresh')
-    ac.setCustomFont(updateSectionElements['refreshUpdateGUIButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(updateSectionElements['refreshUpdateGUIButton'], "Open Sans", 0, 1)
     ac.setFontSize(updateSectionElements['refreshUpdateGUIButton'], 14)
-    # ac.setBackgroundColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['refreshUpdateGUIButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(updateSectionElements['refreshUpdateGUIButton'], 0)
-    # ac.drawBackground(updateSectionElements['refreshUpdateGUIButton'], 1)
     ac.drawBorder(updateSectionElements['refreshUpdateGUIButton'], 1)
     ac.addOnClickedListener(updateSectionElements['refreshUpdateGUIButton'], onRefreshUpdateSectionButtonClick)
     ac.setVisible(updateSectionElements['refreshUpdateGUIButton'], 0)
@@ -753,12 +746,11 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['trimSelectorRaceButton'], 610, 245)
     ac.setSize(updateSectionElements['trimSelectorRaceButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorRaceButton'], 'Race')
-    ac.setCustomFont(updateSectionElements['trimSelectorRaceButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(updateSectionElements['trimSelectorRaceButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['trimSelectorRaceButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
-    # ac.drawBackground(updateSectionElements['trimSelectorRaceButton'], 1)
     ac.drawBorder(updateSectionElements['trimSelectorRaceButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorRaceButton'], onUpdateTrimSelectorRaceButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorRaceButton'], 0)
@@ -767,12 +759,11 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['trimSelectorQualyButton'], 673, 245)
     ac.setSize(updateSectionElements['trimSelectorQualyButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorQualyButton'], 'Qualy')
-    ac.setCustomFont(updateSectionElements['trimSelectorQualyButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(updateSectionElements['trimSelectorQualyButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['trimSelectorQualyButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
-   #  ac.drawBackground(updateSectionElements['trimSelectorQualyButton'], 1)
     ac.drawBorder(updateSectionElements['trimSelectorQualyButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorQualyButton'], onUpdateTrimSelectorQualyButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorQualyButton'], 0)
@@ -781,12 +772,11 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['trimSelectorBaseButton'], 736, 245)
     ac.setSize(updateSectionElements['trimSelectorBaseButton'], 63, 22)
     ac.setText(updateSectionElements['trimSelectorBaseButton'], 'Base')
-    ac.setCustomFont(updateSectionElements['trimSelectorBaseButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(updateSectionElements['trimSelectorBaseButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['trimSelectorBaseButton'], 15)
     ac.setBackgroundColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
     ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
-    # ac.drawBackground(updateSectionElements['trimSelectorBaseButton'], 1)
     ac.drawBorder(updateSectionElements['trimSelectorBaseButton'], 1)
     ac.addOnClickedListener(updateSectionElements['trimSelectorBaseButton'], onUpdateTrimSelectorBaseButtonClick)
     ac.setVisible(updateSectionElements['trimSelectorBaseButton'], 0)
@@ -795,12 +785,11 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['baselineSelectorButton'], 610, 275)
     ac.setSize(updateSectionElements['baselineSelectorButton'], 190, 22)
     ac.setText(updateSectionElements['baselineSelectorButton'], 'Track Specific')
-    ac.setCustomFont(updateSectionElements['baselineSelectorButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(updateSectionElements['baselineSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['baselineSelectorButton'], 15)
     ac.setBackgroundColor(updateSectionElements['baselineSelectorButton'], 1, 1, 1)
     ac.setFontColor(updateSectionElements['baselineSelectorButton'], 0.25098, 0.66274, 0.66274, 1)
     ac.setBackgroundOpacity(updateSectionElements['baselineSelectorButton'], 0)
-    # ac.drawBackground(updateSectionElements['baselineSelectorButton'], 1)
     ac.drawBorder(updateSectionElements['baselineSelectorButton'], 1)
     ac.addOnClickedListener(updateSectionElements['baselineSelectorButton'], onUpdateBaselineSelectorButtonClick)
     ac.setVisible(updateSectionElements['baselineSelectorButton'], 0)
@@ -809,7 +798,7 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['fileSelectorButton'], 610, 305)
     ac.setSize(updateSectionElements['fileSelectorButton'], 190, 22)
     ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
-    ac.setCustomFont(updateSectionElements['fileSelectorButton'], "OpenSans", 0, 0)
+    ac.setCustomFont(updateSectionElements['fileSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['fileSelectorButton'], 14)
     ac.addOnClickedListener(updateSectionElements['fileSelectorButton'], onUpdateFileSelectorButtonClick)
     ac.setVisible(updateSectionElements['fileSelectorButton'], 0)
@@ -818,7 +807,7 @@ def initUploadSectionGUI():
     ac.setPosition(updateSectionElements['uploadButton'], 660, 350)
     ac.setSize(updateSectionElements['uploadButton'], 90, 25)
     ac.setText(updateSectionElements['uploadButton'], 'Update')
-    ac.setCustomFont(updateSectionElements['uploadButton'], "OpenSans", 0, 1)
+    ac.setCustomFont(updateSectionElements['uploadButton'], "Open Sans", 0, 1)
     ac.setBackgroundColor(updateSectionElements['uploadButton'], 0.25098, 0.66274, 0.66274)
     ac.setFontSize(updateSectionElements['uploadButton'], 17)
     ac.setFontColor(updateSectionElements['uploadButton'], 1, 1, 1, 1)
@@ -882,7 +871,7 @@ def initUploadSectionGUI():
             ac.setText(label, '')
             ac.setSize(label, GUIConfig.GUIConstants['updateTableLayout']['cellXSize'][cellId],
                        GUIConfig.GUIConstants['updateTableLayout']['cellHeight'])
-            ac.setCustomFont(label, 'OpenSans', 0, 0)
+            ac.setCustomFont(label, 'Open Sans', 0, 0)
             ac.setFontSize(label, 15)
 
             if cellId == 'select_cell':
@@ -1087,8 +1076,6 @@ def updateSetupsListingTable(setups):
 
         for cellName, labelCtrl in listingTable[rowNumber].items():
             ac.setVisible(labelCtrl, 1)
-            ac.setCustomFont(labelCtrl, "OpenSans", 0, 0)
-            ac.setFontSize(labelCtrl, 15)
 
             if cellName == 'dl_cell':
                 ac.setBackgroundTexture(labelCtrl, 'apps/python/thesetupmarket/img/dl_bg_alt.png')
@@ -1243,20 +1230,13 @@ def showUpdateUserSetupDetails(setupDetails):
     ac.setVisible(updateSectionElements['fileSelectorButton'], 1)
 
     if setupDetails['type'] == 'race':
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 1)
         ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 0.25098, 0.66274, 0.66274, 1)
-        # cahnge font color
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
         ac.setFontColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1, 1)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
         ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
     elif setupDetails['type'] == 'qualy':
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 1, 1, 1)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 0, 0, 0)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
         ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 1)
@@ -1264,9 +1244,6 @@ def showUpdateUserSetupDetails(setupDetails):
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorBaseButton'], 0)
         ac.setFontColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1, 1)
     else:
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorRaceButton'], 0, 0, 0)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorQualyButton'], 0, 0, 0)
-        #GUIhelpers.changeElementBgColor(updateSectionElements['trimSelectorBaseButton'], 1, 1, 1)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorRaceButton'], 0)
         ac.setFontColor(updateSectionElements['trimSelectorRaceButton'], 1, 1, 1, 1)
         ac.setBackgroundOpacity(updateSectionElements['trimSelectorQualyButton'], 0)
@@ -1577,27 +1554,21 @@ def onSendRatingClick(*args):
 def on1RatingClick(*args):
     setRatingStarsColor(1)
 
-    # set global ratingToSend var to 1
 
 def on2RatingClick(*args):
     setRatingStarsColor(2)
 
-    # set global ratingToSend var to 2
 
 def on3RatingClick(*args):
     setRatingStarsColor(3)
 
-    # set global ratingToSend var to 3
 
 def on4RatingClick(*args):
     setRatingStarsColor(4)
 
-    # set global ratingToSend var to 4
 
 def on5RatingClick(*args):
     setRatingStarsColor(5)
-
-    # set global ratingToSend var to 5
 
 
 def openRatingDialog(setupId):
@@ -1612,7 +1583,7 @@ def openRatingDialog(setupId):
     ac.setVisible(refreshSetupsButton, 0)
 
     # Get the user rating for that setup and color appropriately the stars (if already rated)
-    setRatingStarsColor(0) #set to 0 for now
+    setRatingStarsColor(0) #set to 0 for now, TODO: fetch the actual rating of the user.
 
     # Show the rating dialog
     ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 1)
@@ -1624,11 +1595,8 @@ def openRatingDialog(setupId):
     ac.setVisible(listingTableMisc['ratingDialogSendButton']['label'], 1)
     ac.setVisible(listingTableMisc['ratingDialogCancelButton']['label'], 1)
 
-    # set the send button click event.
-
 
 def closeRatingDialog():
-    # Show the rating dialog
     ac.setVisible(listingTableMisc['ratingDialogTitle']['label'], 0)
     ac.setVisible(listingTableMisc['ratingDialog1Star']['label'], 0)
     ac.setVisible(listingTableMisc['ratingDialog2Star']['label'], 0)
@@ -2079,7 +2047,7 @@ def addTableCell(text, sizeX, r, g, b, posX, posY, textAlign, element):
     ac.setBackgroundOpacity(cell, 1)
     ac.drawBackground(cell, 1)
     ac.drawBorder(cell, 0)
-    ac.setCustomFont(cell, "OpenSans", 0, 1)
+    ac.setCustomFont(cell, "Open Sans", 0, 1)
     ac.setFontSize(cell, 15)
     ac.setVisible(cell, 1)
 
