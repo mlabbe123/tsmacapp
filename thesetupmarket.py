@@ -795,7 +795,7 @@ def initUploadSectionGUI():
     # Set the update file selector button
     ac.setPosition(updateSectionElements['fileSelectorButton'], 610, 305)
     ac.setSize(updateSectionElements['fileSelectorButton'], 190, 22)
-    ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
+    ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName[0:25])
     ac.setCustomFont(updateSectionElements['fileSelectorButton'], "Open Sans", 0, 0)
     ac.setFontSize(updateSectionElements['fileSelectorButton'], 14)
     ac.addOnClickedListener(updateSectionElements['fileSelectorButton'], onUpdateFileSelectorButtonClick)
@@ -888,7 +888,7 @@ def initUploadSectionGUI():
                     ac.addOnClickedListener(label, onSelectUserSetupUpdateButton5Clicked)
             else:
                 if cellId == 'file_name_cell':
-                    ac.setFontSize(label, 14)
+                    ac.setFontSize(label, 13)
 
                 ac.setBackgroundColor(label, GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'R'],
                                       GUIConfig.GUIConstants['tableRowColor' + str(rowNumber) + 'G'],
@@ -1129,7 +1129,7 @@ def updateSetupsListingTable(setups):
             elif cellName == 'version_cell':
                 ac.setText(labelCtrl, 'v'+str(setup['version']))
             elif cellName == 'filename_cell':
-                ac.setText(labelCtrl, str(setup['file_name']))
+                ac.setText(labelCtrl, str(setup['file_name'])[0:33])
 
         rowNumber += 1
 
@@ -1227,10 +1227,10 @@ def showUpdateUserSetupDetails(setupDetails):
     ac.setVisible(updateSectionElements['updateOptionsMessageLabel'], 0)
 
     if setupDetails['file_name'] in allSetupsFileNamesInFolder:
-        ac.setText(updateSectionElements['fileSelectorButton'], setupDetails['file_name'])
+        ac.setText(updateSectionElements['fileSelectorButton'], setupDetails['file_name'][0:25])
         currentUpdateFileName = setupDetails['file_name']
     else:
-        ac.setText(updateSectionElements['fileSelectorButton'], allSetupsFileNamesInFolder[0])
+        ac.setText(updateSectionElements['fileSelectorButton'], allSetupsFileNamesInFolder[0][0:25])
         currentUpdateFileName = allSetupsFileNamesInFolder[0]
 
     ac.setVisible(updateSectionElements['fileSelectorButton'], 1)
@@ -1374,8 +1374,8 @@ def updateUserSetupsListingTable(setups):
             if cellName == 'select_cell':
                 ac.setText(labelCtrl, 'Select')
             elif cellName == 'file_name_cell':
-                ac.setText(labelCtrl, setup['file_name'])
-                ac.setFontSize(labelCtrl, 13)
+                ac.setText(labelCtrl, setup['file_name'][0:21])
+                # ac.setFontSize(labelCtrl, 13)
             elif cellName == 'track_cell':
                 ac.setText(labelCtrl, setup['track']['name'])
             elif cellName == 'trim_cell':
@@ -1695,7 +1695,7 @@ def onFileSelectorButtonClick(*args):
         else:
             currentUploadFileName = allSetupsFileNamesInFolder[0]
 
-        ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName)
+        ac.setText(uploadSectionElements['fileSelectorButton'], currentUploadFileName[0:38])
 
 
 def onTrimSelectorButtonClick(*args):
@@ -1840,7 +1840,7 @@ def onUpdateFileSelectorButtonClick(*args):
         else:
             currentUpdateFileName = allSetupsFileNamesInFolder[0]
 
-        ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName)
+        ac.setText(updateSectionElements['fileSelectorButton'], currentUpdateFileName[0:25])
 
 
 def onUpdateUploadButtonClick(*args):
