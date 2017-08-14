@@ -55,7 +55,7 @@ except Exception as e:
 #######################################
 def getSetups(car_code, currentTrackBaseName, currentTrackLayout):
     try:
-        resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/')
+        resp = requests.get('http://thesetupmarket.com/api/get-setups-for-app/?car=' + car_code)
     except requests.exceptions.RequestException as e:
         ac.log('TheSetupMarket logs | error requesting setups from tsm api: ' + str(e))
 
@@ -133,7 +133,7 @@ def getAllSetupsFromFolder(car_ac_code, track_baseName):
     allSetupFilesNotTSM = []
 
     for setupFile in allSetupFiles:
-        if 'TSM-ac' not in setupFile:
+        if '.sp' not in setupFile:
             allSetupFilesNotTSM.append(setupFile)
 
     ac.log('TheSetupMarket logs | all setups in folder not TSM: ' + str(allSetupFilesNotTSM))
@@ -193,7 +193,7 @@ def uploadSetup(userTSMId, ac_version, user_steamId, filename, trim, baseline, c
 
 def getUserSetups(userTSMId, car_id, track_id):
     try:
-        resp = requests.get('http://thesetupmarket.com/api/get-setups-by-user/' + userTSMId)
+        resp = requests.get('http://thesetupmarket.com/api/get-setups-by-user/' + userTSMId + '/' + car_id)
     except requests.exceptions.RequestException as e:
         ac.log('TheSetupMarket logs | getUserSetups error request!: ' + str(e))
 
