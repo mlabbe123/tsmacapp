@@ -168,9 +168,9 @@ def initUploadSection():
     refreshUploadSection()
 
 
-# Was needed for async feature (I think) but its nor more... For some reason...
-#def acUpdate(delta_t):
-#    doNothing = 1
+# Needed for some people in order to get the async functions to work.
+def acUpdate(delta_t):
+    doNothing = 1
 
 
 def initAppWithError(state='IMPORT_ERROR'):
